@@ -1,0 +1,2645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Operativo del Jungla — Titans x Claude</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0f13;
+  --surface: #16181f;
+  --surface2: #1e2029;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --text: #e8e6e0;
+  --muted: #7a7870;
+  --accent: #c8f55a;
+  --accent2: #5af5c0;
+  --accent3: #f5a25a;
+  --red: #f55a5a;
+  --gold: #f5d05a;
+  --purple: #a25af5;
+  --radius: 10px;
+  --sidebar-w: 260px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Figtree', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  position: fixed;
+  top: 0; left: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.sidebar-header {
+  padding: 22px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 16px;
+  color: var(--accent);
+  letter-spacing: -0.3px;
+}
+
+.sidebar-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.chapter-list { padding: 12px 0; flex: 1; }
+
+.chapter-group-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  padding: 12px 20px 6px;
+}
+
+.chapter-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 20px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+}
+
+.chapter-btn:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+
+.chapter-btn.active {
+  color: var(--accent);
+  background: rgba(200,245,90,0.06);
+  border-left-color: var(--accent);
+}
+
+.chapter-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: inherit;
+  opacity: 0.6;
+  min-width: 18px;
+}
+
+.progress-wrap { padding: 16px 20px; border-top: 1px solid var(--border); }
+.progress-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; display: flex; justify-content: space-between; }
+.progress-bar { height: 3px; background: var(--border2); border-radius: 2px; }
+.progress-fill { height: 3px; background: var(--accent); border-radius: 2px; transition: width 0.4s; }
+
+/* MAIN */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+.page { display: none; padding: 48px 40px; max-width: 820px; width: 100%; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* CHAPTER HEADER */
+.chapter-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chapter-tag::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  background: var(--accent);
+}
+
+h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 38px;
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+h1 em { color: var(--accent); font-style: italic; }
+
+.subtitle {
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 36px;
+  max-width: 560px;
+  line-height: 1.6;
+}
+
+h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  color: var(--text);
+  margin: 32px 0 14px;
+  letter-spacing: -0.3px;
+}
+
+h3 {
+  font-family: 'Figtree', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin: 24px 0 10px;
+}
+
+p { margin-bottom: 14px; color: var(--text); }
+p:last-child { margin-bottom: 0; }
+
+/* CARDS */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+}
+
+.card-accent {
+  border-color: rgba(200,245,90,0.25);
+  background: rgba(200,245,90,0.04);
+}
+
+.card-red {
+  border-color: rgba(245,90,90,0.25);
+  background: rgba(245,90,90,0.04);
+}
+
+.card-gold {
+  border-color: rgba(245,208,90,0.25);
+  background: rgba(245,208,90,0.04);
+}
+
+.card-purple {
+  border-color: rgba(162,90,245,0.25);
+  background: rgba(162,90,245,0.04);
+}
+
+/* GRID */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+/* FRAMEWORK LETTER BOXES */
+.framework { display: flex; flex-direction: column; gap: 8px; }
+
+.fw-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  transition: border-color 0.15s;
+}
+
+.fw-row:hover { border-color: var(--border2); }
+
+.fw-letter {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  color: var(--accent);
+  min-width: 32px;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.fw-title { font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 3px; }
+.fw-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.fw-note { font-size: 12px; color: var(--accent2); margin-top: 4px; font-style: italic; }
+
+/* TABLE */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0;
+  font-size: 13px;
+}
+
+.data-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: top;
+}
+
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* PILL BADGES */
+.pill {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+}
+
+.pill-green { background: rgba(90,245,192,0.15); color: var(--accent2); border: 1px solid rgba(90,245,192,0.25); }
+.pill-red   { background: rgba(245,90,90,0.15);  color: var(--red);    border: 1px solid rgba(245,90,90,0.25); }
+.pill-gold  { background: rgba(245,208,90,0.15); color: var(--gold);   border: 1px solid rgba(245,208,90,0.25); }
+.pill-accent { background: rgba(200,245,90,0.15); color: var(--accent); border: 1px solid rgba(200,245,90,0.25); }
+.pill-purple { background: rgba(162,90,245,0.15); color: var(--purple); border: 1px solid rgba(162,90,245,0.25); }
+
+/* SEMAPHORE */
+.semaphore { display: flex; gap: 8px; align-items: center; }
+.sem-light {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  transition: all 0.2s;
+}
+.sem-green  { background: #5af5c0; border-color: #5af5c0; box-shadow: 0 0 8px rgba(90,245,192,0.5); }
+.sem-yellow { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 8px rgba(245,208,90,0.5); }
+.sem-red    { background: var(--red); border-color: var(--red); box-shadow: 0 0 8px rgba(245,90,90,0.5); }
+.sem-off    { background: var(--surface2); }
+
+/* ABILITY CARDS */
+.ability-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.ability-row:last-child { border-bottom: none; }
+
+.ability-key {
+  width: 34px; height: 34px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.ak-p { background: rgba(162,90,245,0.2); color: var(--purple); border: 1px solid rgba(162,90,245,0.3); }
+.ak-q { background: rgba(90,245,192,0.15); color: var(--accent2); border: 1px solid rgba(90,245,192,0.25); }
+.ak-w { background: rgba(90,160,245,0.15); color: #5aa0f5; border: 1px solid rgba(90,160,245,0.25); }
+.ak-e { background: rgba(245,162,90,0.15); color: var(--accent3); border: 1px solid rgba(245,162,90,0.25); }
+.ak-r { background: rgba(245,90,90,0.15); color: var(--red); border: 1px solid rgba(245,90,90,0.25); }
+
+.ability-name { font-weight: 600; font-size: 13px; color: var(--text); margin-bottom: 3px; }
+.ability-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.ability-tip  { font-size: 11px; color: var(--accent); margin-top: 4px; font-style: italic; }
+
+/* MATCHUP LISTS */
+.matchup-list { display: flex; flex-direction: column; gap: 6px; }
+.matchup-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+.mi-bad  { background: rgba(245,90,90,0.08);  border: 1px solid rgba(245,90,90,0.15); }
+.mi-good { background: rgba(90,245,192,0.06); border: 1px solid rgba(90,245,192,0.15); }
+.mi-name-bad  { color: #f09090; font-weight: 500; }
+.mi-name-good { color: #90f0c8; font-weight: 500; }
+.mi-wr-bad  { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--red); }
+.mi-wr-good { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent2); }
+.mi-reason { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* CHAMP TABS */
+.champ-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.champ-tab {
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Figtree', sans-serif;
+}
+.champ-tab:hover { border-color: var(--border2); color: var(--text); }
+.champ-tab.active { background: rgba(200,245,90,0.1); color: var(--accent); border-color: rgba(200,245,90,0.3); }
+
+.champ-panel { display: none; }
+.champ-panel.active { display: block; }
+
+/* KPI TABLE */
+.kpi-row {
+  display: grid;
+  grid-template-columns: 180px repeat(4, 1fr);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  align-items: center;
+}
+.kpi-row:last-child { border-bottom: none; }
+.kpi-header { background: var(--surface2); border-radius: 7px 7px 0 0; }
+.kpi-header .kpi-cell { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+.kpi-name { font-weight: 600; color: var(--text); }
+.kpi-cell { color: var(--muted); }
+.kpi-highlight { color: var(--accent); font-weight: 600; }
+
+/* HIGHLIGHT BOX */
+.highlight {
+  border-left: 3px solid var(--accent);
+  background: rgba(200,245,90,0.04);
+  padding: 14px 18px;
+  border-radius: 0 8px 8px 0;
+  margin: 16px 0;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--text);
+}
+
+/* COMBO SEQUENCE */
+.combo-seq {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0;
+}
+.combo-step {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+}
+.combo-arrow { color: var(--muted); font-size: 12px; }
+
+/* CHECKLIST */
+.checklist { display: flex; flex-direction: column; gap: 8px; }
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.check-item:hover { border-color: var(--border2); }
+.check-item.checked { border-color: rgba(200,245,90,0.3); background: rgba(200,245,90,0.04); }
+.check-box {
+  width: 18px; height: 18px;
+  border: 1.5px solid var(--border2);
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.check-item.checked .check-box { background: var(--accent); border-color: var(--accent); }
+.check-tick { display: none; }
+.check-item.checked .check-tick { display: block; }
+.check-tick-svg { width: 10px; height: 10px; stroke: #000; stroke-width: 2.5; fill: none; }
+.check-label { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.check-sub { font-size: 12px; color: var(--muted); }
+
+/* NAV */
+.bottom-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text);
+}
+
+.nav-btn:hover { background: var(--surface2); border-color: var(--border2); }
+.nav-btn.primary { background: var(--accent); color: #0e0f13; border-color: var(--accent); }
+.nav-btn.primary:hover { background: #d4f96a; }
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* PYRAMID */
+.pyramid { display: flex; flex-direction: column-reverse; gap: 4px; align-items: center; margin: 20px 0; }
+.pyr-level {
+  border-radius: 6px;
+  padding: 10px 16px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+/* INTERACTIVE GANK CHECKER */
+.gank-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.gank-factor {
+  padding: 12px 14px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--surface);
+}
+.gank-factor:hover { border-color: var(--border2); }
+.gank-factor.yes { border-color: rgba(90,245,192,0.4); background: rgba(90,245,192,0.06); }
+.gank-factor.no  { border-color: rgba(245,90,90,0.4);  background: rgba(245,90,90,0.06); }
+.gf-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  display: inline-block; margin-right: 8px;
+  vertical-align: middle; transition: all 0.15s;
+}
+.gank-factor.yes .gf-dot { background: var(--accent2); border-color: var(--accent2); }
+.gank-factor.no  .gf-dot { background: var(--red); border-color: var(--red); }
+.gf-label { font-size: 13px; font-weight: 600; color: var(--text); }
+.gf-sub { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+/* VERDICT */
+.verdict {
+  border-radius: 9px;
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid;
+  transition: all 0.3s;
+}
+.v-wait   { background: var(--surface); border-color: var(--border); color: var(--muted); }
+.v-go     { background: rgba(90,245,192,0.08); border-color: rgba(90,245,192,0.3); color: var(--accent2); }
+.v-maybe  { background: rgba(245,208,90,0.08); border-color: rgba(245,208,90,0.3); color: var(--gold); }
+.v-stop   { background: rgba(245,90,90,0.08);  border-color: rgba(245,90,90,0.3);  color: var(--red); }
+
+/* DIVIDER */
+.divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+/* SCROLL INDICATOR */
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+
+.tag-line {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  gap: 14px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+}
+.tag-line span::before { content: '// '; color: var(--accent); }
+
+/* CHAMPION ICONS */
+.ci { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; vertical-align: middle; margin-right: 8px; border: 1px solid var(--border2); flex-shrink: 0; }
+.ci-sm { width: 22px; height: 22px; border-radius: 5px; margin-right: 6px; }
+.ci-lg { width: 40px; height: 40px; border-radius: 8px; margin-right: 10px; }
+.ci-round { border-radius: 50%; }
+
+/* ABILITY ICONS */
+.ability-icon { width: 34px; height: 34px; border-radius: 7px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border2); }
+
+/* ENHANCED MATCHUP ITEMS */
+.matchup-item { display: flex; align-items: center; gap: 8px; }
+.matchup-item .mi-info { flex: 1; }
+
+/* CHAMP TAB WITH ICON */
+.champ-tab img { width: 20px; height: 20px; border-radius: 4px; vertical-align: middle; margin-right: 4px; margin-top: -2px; border: 1px solid rgba(255,255,255,0.1); }
+
+/* SIDEBAR CHAMPION ICONS */
+.sidebar-logo { display: flex; align-items: center; gap: 8px; }
+
+/* COMPOSITION CARD ICONS */
+.comp-card-icon { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.comp-card-icon img { width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid var(--border2); }
+
+/* VISUAL POLISH */
+.page { position: relative; }
+.chapter-tag::after { content: ''; position: absolute; top: 0; right: 0; width: 200px; height: 200px; background: radial-gradient(circle at top right, rgba(200,245,90,0.04), transparent 70%); pointer-events: none; border-radius: 0 0 0 200px; }
+
+/* GLOWING HEADER ACCENTS */
+h1 em { text-shadow: 0 0 40px rgba(200,245,90,0.15); }
+
+/* ENHANCED SIDEBAR */
+.sidebar-header { position: relative; overflow: hidden; }
+.sidebar-header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, var(--accent), transparent); opacity: 0.3; }
+
+/* CHAMPION PORTRAIT STRIP */
+.champ-strip { display: flex; gap: 8px; align-items: center; margin: 20px 0; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.champ-strip img { width: 48px; height: 48px; border-radius: 10px; border: 2px solid var(--border2); transition: all 0.2s; }
+.champ-strip img:hover { border-color: var(--accent); transform: scale(1.08); }
+.champ-strip .strip-info { flex: 1; }
+.champ-strip .strip-name { font-weight: 600; font-size: 15px; }
+.champ-strip .strip-sub { font-size: 12px; color: var(--muted); }
+
+/* ABILITY ROW ENHANCED */
+.ability-row { position: relative; }
+.ability-row::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; border-radius: 1px; opacity: 0; transition: opacity 0.2s; }
+.ability-row:hover::before { opacity: 1; }
+.ability-row:nth-child(1):hover::before { background: var(--purple); }
+.ability-row:nth-child(2):hover::before { background: var(--accent2); }
+.ability-row:nth-child(3):hover::before { background: #5aa0f5; }
+.ability-row:nth-child(4):hover::before { background: var(--accent3); }
+.ability-row:nth-child(5):hover::before { background: var(--red); }
+
+/* MATCHUP ROW ENHANCED */
+.matchup-item { transition: transform 0.15s; }
+.matchup-item:hover { transform: translateX(3px); }
+
+/* TABLE GLOW HEADERS */
+.data-table th { position: relative; }
+.data-table th::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, var(--accent), transparent); opacity: 0.2; }
+
+/* ULT TIER PILLS GLOW */
+.pill-green { box-shadow: 0 0 8px rgba(90,245,192,0.15); }
+.pill-red { box-shadow: 0 0 8px rgba(245,90,90,0.15); }
+.pill-accent { box-shadow: 0 0 8px rgba(200,245,90,0.15); }
+
+/* LOADING IMG PLACEHOLDER */
+img.ci[src=""], img.ci:not([src]) { background: var(--surface2); }
+img.ci { background: var(--surface2); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">Sistema Operativo del Jungla</div>
+    <div class="sidebar-sub">Patch 16.8 · Titans x Claude</div>
+  </div>
+  <div class="chapter-list">
+    <div class="chapter-group-label">Fundamentos</div>
+    <button class="chapter-btn active" onclick="goTo(0)" id="cb-0">
+      <span class="chapter-num">01</span> El Director Invisible
+    </button>
+    <button class="chapter-btn" onclick="goTo(1)" id="cb-1">
+      <span class="chapter-num">02</span> Framework P.A.T.H.
+    </button>
+    <button class="chapter-btn" onclick="goTo(2)" id="cb-2">
+      <span class="chapter-num">03</span> Pirámide del Jungla
+    </button>
+
+    <div class="chapter-group-label">Sistemas</div>
+    <button class="chapter-btn" onclick="goTo(3)" id="cb-3">
+      <span class="chapter-num">04</span> Los 4 Pathings
+    </button>
+    <button class="chapter-btn" onclick="goTo(4)" id="cb-4">
+      <span class="chapter-num">05</span> Pantalla de Carga
+    </button>
+    <button class="chapter-btn" onclick="goTo(5)" id="cb-5">
+      <span class="chapter-num">06</span> Sistema M.I.R.R.O.R.
+    </button>
+    <button class="chapter-btn" onclick="goTo(6)" id="cb-6">
+      <span class="chapter-num">07</span> Framework G.A.N.K.
+    </button>
+    <button class="chapter-btn" onclick="goTo(7)" id="cb-7">
+      <span class="chapter-num">08</span> Sistema SMITE
+    </button>
+
+    <div class="chapter-group-label">KPIs y Métricas</div>
+    <button class="chapter-btn" onclick="goTo(8)" id="cb-8">
+      <span class="chapter-num">09</span> KPIs por Elo
+    </button>
+    <button class="chapter-btn" onclick="goTo(9)" id="cb-9">
+      <span class="chapter-num">10</span> KPIs Propietarios
+    </button>
+    <button class="chapter-btn" onclick="goTo(10)" id="cb-10">
+      <span class="chapter-num">11</span> Anti-Tilt SOP
+    </button>
+
+    <div class="chapter-group-label">Tu Pool</div>
+    <button class="chapter-btn" onclick="goTo(11)" id="cb-11">
+      <span class="chapter-num">12</span> Sylas · Viego · Diana
+    </button>
+    <button class="chapter-btn" onclick="goTo(12)" id="cb-12">
+      <span class="chapter-num">13</span> Evaluador de Gankeo
+    </button>
+    <button class="chapter-btn" onclick="goTo(13)" id="cb-13">
+      <span class="chapter-num">14</span> Matchups y Composiciones
+    </button>
+
+    <div class="chapter-group-label">Herramientas</div>
+    <button class="chapter-btn" onclick="goTo(14)" id="cb-14">
+      <span class="chapter-num">15</span> KPI Tracker
+    </button>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>Progreso</span>
+      <span id="prog-text">1/15</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="prog-fill" style="width:7.7%"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+<!-- PAGE 0: El Director Invisible -->
+<div class="page active" id="p0">
+  <div class="chapter-tag">Capítulo 01 — Fundamentos</div>
+  <h1>El <em>Director</em><br>Invisible</h1>
+  <div class="tag-line">
+    <span>Creencia falsa destruida</span>
+    <span>Marco mental challenger</span>
+    <span>Por qué el jungla gana partidas</span>
+  </div>
+
+  <div class="card card-red">
+    <strong>Creencia falsa que hay que destruir:</strong> "El jungla es el que gankea." Si le preguntas a alguien de Plata qué hace el jungla, te dice <em style="color:var(--red)">gankear y hacer objetivos</em>. Si le preguntas a un Challenger, te dice <em>controlar el flujo del juego</em>. Esa diferencia de respuesta es exactamente por qué uno está en Challenger y el otro no.
+  </div>
+
+  <h2>La definición real del rol</h2>
+  <p>Mientras un toplaner reacciona al campeón que tiene enfrente, tú como jungla tomas decisiones que afectan a <strong>tres líneas simultáneamente</strong>. No reaccionas — decides. En los próximos 60 segundos tú decides quién gana su línea, qué objetivo cae, qué lado del mapa se abre.</p>
+
+  <div class="highlight">"Un jungla que va 0/0/0 en minuto 10 puede estar ganando el juego para su equipo."</div>
+
+  <p>Tomó los dos primeros dragones. Su pathing forzó al jungler enemigo a ir siempre por behind. Sus laners nunca fueron gankeados porque les avisó. Cero kills, victoria total en el tablero. <strong>Las kills son el resultado, no la causa.</strong></p>
+
+  <h2>Los cuatro sistemas de aprendizaje</h2>
+  <div class="grid2">
+    <div class="card"><strong>Framework</strong> — una receta exacta de cómo pensar ante cada situación</div>
+    <div class="card"><strong>SOP</strong> — procedimiento paso a paso, ejecutable sin pensar</div>
+    <div class="card"><strong>KPI</strong> — número exacto que indica si vas por el camino correcto</div>
+    <div class="card"><strong>Ejemplo con dato</strong> — comprobación cuantitativa de cada afirmación</div>
+  </div>
+
+  <div class="highlight">"Un jungla de elo bajo camina 45 segundos entre campamentos sin propósito. En 10 minutos = 3-4 minutos de tiempo muerto = 600g de ventaja para el enemigo + 1-2 niveles + 2-3 gankeos que nunca tuviste. No te ganó en peleas — te ganó caminando con propósito mientras tú caminabas sin él."</div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" disabled>← Anterior</button>
+    <button class="nav-btn primary" onclick="goTo(1)">Siguiente: Framework P.A.T.H. →</button>
+  </div>
+</div>
+
+<!-- PAGE 1: FRAMEWORK PATH -->
+<div class="page" id="p1">
+  <div class="chapter-tag">Capítulo 02 — Fundamentos</div>
+  <h1>Framework<br><em>P.A.T.H.</em></h1>
+  <div class="tag-line">
+    <span>Receta exacta</span>
+    <span>Pre-partida</span>
+    <span>Anti sesgo cognitivo</span>
+  </div>
+
+  <p>Una receta de 4 letras que define cómo piensa un Challenger antes de que empiece la partida. No es sugerencia — es el proceso completo de pensamiento de un jungla de alto elo.</p>
+
+  <div class="framework">
+    <div class="fw-row">
+      <div class="fw-letter">P</div>
+      <div>
+        <div class="fw-title">Pathing Plan — ruta con decisión</div>
+        <div class="fw-desc">Antes de que spawnen los minions ya tienes decidido tu ruta, qué campamentos harás y por qué vas hacia ese lado del mapa. No es válido "quiero gankear" — necesitas saber <em>por qué</em> esa línea merece el gank.</div>
+        <div class="fw-note">La pantalla de carga es tu sala de estrategia. Úsala.</div>
+      </div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter">A</div>
+      <div>
+        <div class="fw-title">Assess Lanes — lee las 3 líneas</div>
+        <div class="fw-desc">En los primeros 10 segundos del juego identificas: quién tiene CC, quién está en matchup perdido, quién va a pushear. Esto define qué líneas son gankeables y cuáles no.</div>
+        <div class="fw-note">Si estás sesgado, probablemente lo leerás mal. Humildad primero.</div>
+      </div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter">T</div>
+      <div>
+        <div class="fw-title">Track Enemy — traqueo constante</div>
+        <div class="fw-desc">Desde el segundo 0 estás deduciendo dónde está el jungler enemigo. Con el sistema M.I.R.R.O.R. puedes saber su posición el 80% del tiempo sin ningún ward.</div>
+        <div class="fw-note">Un Challenger con 0 wards traquea mejor que un Plata con visión completa.</div>
+      </div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter">H</div>
+      <div>
+        <div class="fw-title">Hit Optimal Play — jugada de mayor valor</div>
+        <div class="fw-desc">No es la jugada que te pide tu laner. No es la más emocionante. Es la que genera más ventaja neta para tu equipo en los próximos 60 segundos.</div>
+        <div class="fw-note">El gankeo que tu top te spamea puede ser la peor jugada disponible.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goTo(0)">← Anterior</button>
+    <button class="nav-btn primary" onclick="goTo(2)">Siguiente: Pirámide del Jungla →</button>
+  </div>
+</div>
+
+<!-- PAGE 2: PIRÁMIDE -->
+<div class="page" id="p2">
+  <div class="chapter-tag">Capítulo 03 — Fundamentos</div>
+  <h1>La Pirámide<br>del <em>Jungla</em></h1>
+  <div class="tag-line">
+    <span>Prioridades por elo</span>
+    <span>Impacto en win rate</span>
+    <span>Tu nivel actual: Plata</span>
+  </div>
+
+  <p>No todo tiene el mismo impacto a todos los elos. Esta pirámide te dice exactamente en qué enfocarte según dónde estás ahora.</p>
+
+  <div class="pyramid">
+    <div class="pyr-level" style="width:100%; background:rgba(90,245,192,0.12); border:1px solid rgba(90,245,192,0.25); color:var(--accent2);">
+      <strong>Hierro → Plata</strong> · Clear eficiente + supervivencia · <span class="pill pill-green">+15% WR</span>
+    </div>
+    <div class="pyr-level" style="width:84%; background:rgba(200,245,90,0.1); border:1px solid rgba(200,245,90,0.2); color:var(--accent);">
+      <strong>Plata → Oro</strong> · Pathing óptimo · estar en el lugar correcto · <span class="pill pill-accent">clave ahora</span>
+    </div>
+    <div class="pyr-level" style="width:68%; background:rgba(245,208,90,0.1); border:1px solid rgba(245,208,90,0.2); color:var(--gold);">
+      <strong>Oro → Platino</strong> · Trackear al jungler enemigo · <span class="pill pill-gold">+20% WR</span>
+    </div>
+    <div class="pyr-level" style="width:52%; background:rgba(245,162,90,0.1); border:1px solid rgba(245,162,90,0.2); color:var(--accent3);">
+      <strong>Platino → Diamante</strong> · Impacto real en gankeos y objetivos · <span class="pill pill-gold">+25% WR</span>
+    </div>
+    <div class="pyr-level" style="width:36%; background:rgba(162,90,245,0.1); border:1px solid rgba(162,90,245,0.2); color:var(--purple);">
+      <strong>Diamante → Challenger</strong> · Dirección de juego completa · <span class="pill pill-purple">+15% WR</span>
+    </div>
+  </div>
+
+  <div class="card card-accent" style="margin-top:20px;">
+    <strong>Lo que esto significa para ti en Plata 2:</strong> El 80% de tu LP está en hacer un clear eficiente y tener un plan antes de que empiece la partida. No necesitas las mecánicas de un Challenger para subir de Plata a Oro — necesitas llegar al 3:15 con un plan y ejecutarlo.
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goTo(1)">← Anterior</button>
+    <button class="nav-btn primary" onclick="goTo(3)">Siguiente: Los 4 Pathings →</button>
+  </div>
+</div>
+
+<!-- PAGE 3: LOS 4 PATHINGS -->
+<div class="page" id="p3">
+  <div class="chapter-tag">Capítulo 04 — Sistemas</div>
+  <h1>Los 4<br><em>Pathings</em></h1>
+  <div class="tag-line">
+    <span>No cuáles son</span>
+    <span>Sino cuándo elegir cada uno</span>
+  </div>
+
+  <p>No es "¿cuál pathing es el mejor?" — todos son correctos en la situación adecuada. La pregunta es cuándo elegir cada uno.</p>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Pathing</th>
+        <th>Cuándo usarlo</th>
+        <th>Si funciona</th>
+        <th>Si falla</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="pill pill-accent">Full Clear</span></td>
+        <td>Líneas estables, no hay jugada clara de mayor valor</td>
+        <td>Nivel 4 antes que el enemigo + máximo oro</td>
+        <td>Bajo riesgo — enemigo gankea pero tú vas más farmeado</td>
+      </tr>
+      <tr>
+        <td><span class="pill pill-gold">3-Camp Gank</span></td>
+        <td>Una línea tiene 3/4 verde en el semáforo GANK</td>
+        <td>Kill/flash forzado + plates + crash de ola</td>
+        <td>Pierdes 3 camps y oro — solo vale si el gankeo genera más valor</td>
+      </tr>
+      <tr>
+        <td><span class="pill pill-purple">Invade</span></td>
+        <td>Sabes dónde está y le ganas el 1v1 confirmado</td>
+        <td>Buff robado + pathing destruido = 5 min de ventaja</td>
+        <td>Mueres — alto riesgo, solo con información confirmada</td>
+      </tr>
+      <tr>
+        <td><span class="pill pill-green">Vertical</span></td>
+        <td>Ambos junglers evitan el mismo lado</td>
+        <td>Farmeo seguro + 1 camp extra + visión de su jungla</td>
+        <td>Pierdes control de un lado del mapa</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="highlight">"El que invade usualmente está en elo alto. Cuando te atreves a hacer cosas distintas, obtienes resultados distintos a la media."</div>
+
+  <h2>La regla del 3:15</h2>
+  <p>Lo que hagas en los 30 segundos después de terminar tu clear define el 60-70% de tu early game. El jungla que llega a esos 30 segundos con un plan ejecuta. El que no tiene plan reacciona. <strong>La jungla no es reacción — es pensamiento.</strong></p>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goTo(2)">← Anterior</button>
+    <button class="nav-btn primary" onclick="goTo(4)">Siguiente: Pantalla de Carga →</button>
+  </div>
+</div>
+
+<!-- PAGE 4: PANTALLA DE CARGA SOP -->
+<div class="page" id="p4">
+  <div class="chapter-tag">Capítulo 05 — Sistemas</div>
+  <h1>SOP:<br><em>Pantalla de Carga</em></h1>
+  <div class="tag-line">
+    <span>40-50 segundos de trabajo</span>
+    <span>Plan A + Plan B</span>
+    <span>El 80% de la partida se decide aquí</span>
+  </div>
+
+  <p>Este es tu SOP (Standard Operating Procedure) completo para los 40-50 segundos que tienes en pantalla de carga. Hazlo en orden, cada vez, hasta que sea automático.</p>
+
+  <div class="checklist" id="loading-checklist">
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"><span class="check-tick"><svg class="check-tick-svg" viewBox="0 0 12 12"><polyline points="1.5,6 4.5,9 10.5,3"/></svg></span></div>
+      <div>
+        <div class="check-label">1 · Identifica al jungler enemigo</div>
+        <div class="check-sub">¿Es farmer o ganker? ¿Te gana el 1v1? ¿Dónde es fuerte, dónde es débil? ¿Qué ult tiene? (clave para Sylas)</div>
+      </div>
+    </div>
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"><span class="check-tick"><svg class="check-tick-svg" viewBox="0 0 12 12"><polyline points="1.5,6 4.5,9 10.5,3"/></svg></span></div>
+      <div>
+        <div class="check-label">2 · Lee las 3 líneas</div>
+        <div class="check-sub">¿Quién tiene CC aliado? ¿Quién va a perder el matchup? ¿Quién va a pushear rápido? Marca la línea más gankeable.</div>
+      </div>
+    </div>
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"><span class="check-tick"><svg class="check-tick-svg" viewBox="0 0 12 12"><polyline points="1.5,6 4.5,9 10.5,3"/></svg></span></div>
+      <div>
+        <div class="check-label">3 · Verifica summoners enemigos</div>
+        <div class="check-sub">¿El ADC/mid/top tiene Flash? Sin flash = gank prioritario. ¿Tienen Teleport? Cambia el valor de gankear top.</div>
+      </div>
+    </div>
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"><span class="check-tick"><svg class="check-tick-svg" viewBox="0 0 12 12"><polyline points="1.5,6 4.5,9 10.5,3"/></svg></span></div>
+      <div>
+        <div class="check-label">4 · Define tu starting side</div>
+        <div class="check-sub">¿Botside o topside? ¿Enemigo arrancó botside? (Sistema Mirror → tú arrancas topside). ¿Dragon próximo? → botside.</div>
+      </div>
+    </div>
+    <div class="check-item" onclick="toggleCheck(this)">
+      <div class="check-box"><span class="check-tick"><svg class="check-tick-svg" viewBox="0 0 12 12"><polyline points="1.5,6 4.5,9 10.5,3"/></svg></span></div>
+      <div>
+        <div class="check-label">5 · Formula la frase del plan</div>
+        <div class="check-sub">"Juego [campeón]. Arranco [side]. Al 3:15 voy a [acción] porque [razón]. Plan B si cambia: [acción]."</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading-complete" style="display:none; margin-top:16px;">
+    <div class="card card-accent">
+      <strong>Plan completo.</strong> Entras al juego con propósito, no a ver qué pasa. El 80% del trabajo ya está hecho.
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goTo(3)">← Anterior</button>
+    <button class="nav-btn primary" onclick="goTo(5)">Siguiente: Sistema M.I.R.R.O.R. →</button>
+  </div>
+</div>
+
+<!-- PAGE 5: SISTEMA MIRROR -->
+<div class="page" id="p5">
+  <div class="chapter-tag">Capítulo 06 — Sistemas</div>
+  <h1>Sistema<br><em>M.I.R.R.O.R.</em></h1>
+  <div class="tag-line">
+    <span>Tracko sin wards</span>
+    <span>80% de precisión</span>
+    <span>Deducción lógica pura</span>
+  </div>
+
+  <div class="card card-red">
+    <strong>Creencia falsa:</strong> "Necesito wards para saber dónde está el enemigo." Un jungla Challenger con 0 wards traquea mejor que uno de Plata con visión completa del mapa. La diferencia es el <strong>sistema de deducción</strong>.
+  </div>
+
+  <div class="framework">
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:22px;min-width:22px;color:var(--accent2)">M</div>
+      <div>
+        <div class="fw-title">Mirror Start — deducción del starting side</div>
+        <div class="fw-desc">Si el bot lane enemigo llegó tarde a su línea → hicieron leash → el jungler empezó botside (95% certeza). Por lo tanto, tú arrancas topside con el lado contrario libre.</div>
+      </div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:22px;min-width:22px;color:var(--accent2)">I</div>
+      <div>
+        <div class="fw-title">Intel — cada dato cuenta</div>
+        <div class="fw-desc">Un pin de tu laner, una W vista en river, cualquier señal cuenta. Tus laners vieron algo → úsalo para actualizar la posición estimada del enemigo.</div>
+      </div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:22px;min-width:22px;color:var(--accent2)">R</div>
+      <div>
+        <div class="fw-title">Respawn Deduction — calcula cuándo hizo el camp</div>
+        <div class="fw-desc">Si pasas por un campamento enemigo vacío, calcula cuándo lo mató. Ahora sabes su ruta pasada y puedes predecir sus futuros movimientos.</div>
+      </div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:22px;min-width:22px;color:var(--accent2)">R</div>
+      <div>
+        <div class="fw-title">Relative Position — el lado opuesto está seguro</div>
+        <div class="fw-desc">Si gankeó top al 3:20 → tu botside está seguro por 30-45 segundos. Actúa. No necesitas visión — necesitas lógica.</div>
+      </div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:22px;min-width:22px;color:var(--accent2)">O</div>
+      <div>
+        <div class="fw-title">Objective Gravity — los objetivos atraen junglers</div>
+        <div class="fw-desc">Dragon spawna en 40 segundos → el jungler enemigo probablemente va botside. La gravedad de los objetivos predice el movimiento del enemigo.</div>
+      </div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:22px;min-width:22px;color:var(--accent2)">R</div>
+      <div>
+        <div class="fw-title">Reset Patterns — se fue a base, predice el nuevo clear</div>
+        <div class="fw-desc">El enemigo hizo back → empieza nuevo clear desde la base. Puedes predecir sus primeros campamentos basándote en su side de inicio habitual.</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Cómo tus laners delatan al jungler enemigo</h2>
+  <table class="data-table">
+    <thead><tr><th>Comportamiento del laner</th><th>Qué significa</th><th>Tu acción</th></tr></thead>
+    <tbody>
+      <tr><td>Juega agresivo de repente sin haber ganado trade</td><td>Su jungler está cerca</td><td>Retrocede de golpe sin recibir daño</td></tr>
+      <tr><td>Deja de farmear y camina hacia river sin razón</td><td>Va a asistir a su jungler</td><td>Avisa y prepara countergank</td></tr>
+      <tr><td>Push agresivo inusual en su matchup</td><td>Va a divear contigo o ya viene su jungla</td><td>Roam coordinado inminente — ping y retrocede</td></tr>
+      <tr><td>Flashea agresivamente sin pelea previa</td><td>Tiene la certeza de que su jungler está ahí</td><td>Counter-gank inmediato si estás cerca</td></tr>
+    </tbody>
+  </table>
+
+  <div class="highlight">"Un Challenger mira el mapa 20-30 veces por minuto. Cada mirada dura menos de 0.5 segundos. Eso es 60-90 data points en 3 minutos. Con esa densidad de información es imposible sorprenderlo. Y eso no es talento — es disciplina."</div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goTo(4)">← Anterior</button>
+    <button class="nav-btn primary" onclick="goTo(6)">Siguiente: Framework G.A.N.K. →</button>
+  </div>
+</div>
+
+<!-- PAGE 6: FRAMEWORK GANK -->
+<div class="page" id="p6">
+  <div class="chapter-tag">Capítulo 07 — Sistemas</div>
+  <h1>Framework<br><em>G.A.N.K.</em></h1>
+  <div class="tag-line">
+    <span>El 55% del valor no es la kill</span>
+    <span>Semáforo de 4 factores</span>
+    <span>Sin sistema = gankeo emocional</span>
+  </div>
+
+  <div class="card card-red">
+    <strong>Creencia falsa:</strong> "Un gankeo sin kill es un gankeo fallido." El 55% del valor de un gankeo NO es la kill. Flash forzado = 300 segundos de ventana. Crash de ola = plates. Enemigo que retrocede = -80 oro. Todo eso suma sin necesitar la kill.
+  </div>
+
+  <div class="framework">
+    <div class="fw-row">
+      <div class="fw-letter">G</div>
+      <div>
+        <div class="fw-title">Gap Closer — ¿puedes alcanzar al enemigo?</div>
+        <div class="fw-desc">¿Tienes dash, pull o algo que cierre la distancia si el enemigo huye? Sin gap closer el gankeo solo funciona si el enemigo está completamente sobreextendido.</div>
+      </div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter">A</div>
+      <div>
+        <div class="fw-title">Allied CC — ¿tu laner puede aislar al enemigo?</div>
+        <div class="fw-desc">¿Tu laner tiene CC duro? Un gankeo con Leona es completamente diferente que uno con Ezreal. El CC aliado multiplica el valor de cualquier gankeo.</div>
+      </div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter">N</div>
+      <div>
+        <div class="fw-title">Numbers — ¿2v1 confirmado?</div>
+        <div class="fw-desc">¿El jungler enemigo está trackeado lejos? ¿El segundo enemigo de esa línea está muerto o en base? Confirma que es un 2v1 antes de entrar.</div>
+      </div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter">K</div>
+      <div>
+        <div class="fw-title">Kill Pressure — ¿puedes matar en ≤6 segundos?</div>
+        <div class="fw-desc">Si el gankeo dura más de 6 segundos, llega ayuda enemiga. ¿Tienes suficiente burst con tu laner para cerrar el kill antes de que lleguen?</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Semáforo de decisión</h2>
+  <table class="data-table">
+    <thead><tr><th>Estado</th><th>Probabilidad</th><th>Resultado esperado</th><th>Decisión</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><div class="semaphore"><div class="sem-light sem-green"></div><div class="sem-light sem-green"></div><div class="sem-light sem-green"></div><div class="sem-light sem-green"></div></div></td>
+        <td><span class="pill pill-green">≥75%</span></td>
+        <td>Kill altamente probable + crash + plates</td>
+        <td><strong>Ejecuta sin dudar</strong></td>
+      </tr>
+      <tr>
+        <td><div class="semaphore"><div class="sem-light sem-green"></div><div class="sem-light sem-green"></div><div class="sem-light sem-green"></div><div class="sem-light sem-off"></div></div></td>
+        <td><span class="pill pill-gold">50-65%</span></td>
+        <td>Flash forzado + presión + crash</td>
+        <td><strong>Entra si hay objetivo en 80s</strong></td>
+      </tr>
+      <tr>
+        <td><div class="semaphore"><div class="sem-light sem-green"></div><div class="sem-light sem-green"></div><div class="sem-light sem-off"></div><div class="sem-light sem-off"></div></div></td>
+        <td><span class="pill pill-gold">25-40%</span></td>
+        <td>Riesgo de counter-gank o escape</td>
+        <td><strong>Solo si compensas el factor</strong></td>
+      </tr>
+      <tr>
+        <td><div class="semaphore"><div class="sem-light sem-red"></div><div class="sem-light sem-off"></div><div class="sem-light sem-off"></div><div class="sem-light sem-off"></div></div></td>
+        <td><span class="pill pill-red">≤20%</span></td>
+        <td>Probablemente mueres</td>
+        <td><strong style="color:var(--red)">No gankees — farmea</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goTo(5)">← Anterior</button>
+    <button class="nav-btn primary" onclick="goTo(7)">Siguiente: Sistema SMITE →</button>
+  </div>
+</div>
+
+<!-- PAGE 7: SISTEMA SMITE -->
+<div class="page" id="p7">
+  <div class="chapter-tag">Capítulo 08 — Sistemas</div>
+  <h1>Sistema<br><em>S.M.I.T.E.</em></h1>
+  <div class="tag-line">
+    <span>Cada 50/50 es un fallo de tracko</span>
+    <span>Valor real de objetivos</span>
+    <span>Protocolo completo</span>
+  </div>
+
+  <div class="card card-red">
+    <strong>Creencia falsa:</strong> "Los 50/50s de Smite son cuestión de suerte o reflejos." Cada 50/50 que juegas es un síntoma de que tu tracko falló. Un jungla Challenger llega al objetivo con información, no a adivinar.
+  </div>
+
+  <div class="framework">
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:22px;min-width:22px;color:var(--accent3)">S</div>
+      <div><div class="fw-title">Sight — visión del pit y los entries</div><div class="fw-desc">¿Tienes visión del pozo y de los puntos de entrada? Si no, no empieces el objetivo. Sin visión = no sabes cuándo llega el enemigo.</div></div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:22px;min-width:22px;color:var(--accent3)">M</div>
+      <div><div class="fw-title">Members — superioridad numérica o igualdad</div><div class="fw-desc">Nunca hagas un 4v5. Si vienen 5 y tú eres 4, tienes que decidir si giras (turn) o dejas el objetivo. En igualdad puedes empezar.</div></div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:22px;min-width:22px;color:var(--accent3)">I</div>
+      <div><div class="fw-title">Intel — dónde está el jungler enemigo</div><div class="fw-desc">¿Muerto? ¿Lejos? Safe → empieza. ¿Vivo y cerca? Pausa o deja el objetivo. Sin información no empieces.</div></div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:22px;min-width:22px;color:var(--accent3)">T</div>
+      <div><div class="fw-title">Timing — ¿puedes terminarlo antes de que lleguen?</div><div class="fw-desc">HP del objetivo ÷ DPS de tu equipo = segundos necesarios. No lo calculas exactamente — tu ojo dice "DPS alto, lo sacamos" o "DPS bajo, es lento".</div></div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:22px;min-width:22px;color:var(--accent3)">E</div>
+      <div><div class="fw-title">Execute — guarda el Smite para el rango exacto</div><div class="fw-desc">No gastes el Smite para acelerar el DPS a menos que el enemigo venga a robarlo. El Smite es para la ejecución final, no para la DPS inicial.</div></div>
+    </div>
+  </div>
+
+  <h2>Valor real de los objetivos</h2>
+  <table class="data-table">
+    <thead><tr><th>Objetivo</th><th>Oro directo</th><th>Valor real total</th></tr></thead>
+    <tbody>
+      <tr><td>Voidgrubs ×3</td><td>~200g</td><td><strong>600-1200g equiv.</strong> — destrucción acelerada de torres todo midgame</td></tr>
+      <tr><td>Dragon (por dragón)</td><td>25g global</td><td><strong>200-500g equiv.</strong> — te acerca al Soul</td></tr>
+      <tr><td>Dragon Soul</td><td>—</td><td><span class="pill pill-red">2500-3500g equiv.</span> — game changer completo</td></tr>
+      <tr><td>Rift Herald</td><td>100g local</td><td><strong>500-1000g equiv.</strong> — plates + daño a torre</td></tr>
+      <tr><td>Baron Nashor</td><td>25g global</td><td><span class="pill pill-red">3000-12000g equiv.</span> — 3 torres + inhibidor potencial</td></tr>
+      <tr><td>Elder Dragon</td><td>—</td><td><span class="pill pill-red">Incalculable</span> — execute bajo 20% HP, cierra games</td></tr>
+    </tbody>
+  </table>
+
+  <div class="highlight">"Si el enemigo se está haciendo Dragon y no puedes contestarlo — toma siempre algo a cambio. Toma torres, toma camps, toma objetivos. Nunca te quedes sin nada."</div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goTo(6)">← Anterior</button>
+    <button class="nav-btn primary" onclick="goTo(8)">Siguiente: KPIs por Elo →</button>
+  </div>
+</div>
+
+<!-- PAGE 8: KPIs -->
+<div class="page" id="p8">
+  <div class="chapter-tag">Capítulo 09 — KPIs y Métricas</div>
+  <h1>KPIs<br><em>por Elo</em></h1>
+  <div class="tag-line">
+    <span>Números exactos</span>
+    <span>Tu target: Plata → Oro</span>
+    <span>Benchmarks verificados</span>
+  </div>
+
+  <p>Estos son los números exactos que correlacionan directamente con subir de liga. Si llegas a los KPIs de tu target elo, subes. No es opinión.</p>
+
+  <div style="overflow-x:auto; margin:16px 0;">
+    <div class="kpi-row kpi-header">
+      <div class="kpi-cell">KPI</div>
+      <div class="kpi-cell">Hierro-Plata</div>
+      <div class="kpi-cell" style="color:var(--accent)">Oro-Platino ← tú</div>
+      <div class="kpi-cell">Diamante</div>
+      <div class="kpi-cell">Master+</div>
+    </div>
+    <div style="background:var(--surface); border-radius:0 0 9px 9px; border:1px solid var(--border); border-top:none;">
+      <div class="kpi-row"><div class="kpi-name">CS/min (jungla)</div><div class="kpi-cell">≥4.5</div><div class="kpi-highlight">≥5.5</div><div class="kpi-cell">≥6.0</div><div class="kpi-cell">≥6.5</div></div>
+      <div class="kpi-row"><div class="kpi-name">Gank success rate</div><div class="kpi-cell">≥40%</div><div class="kpi-highlight">≥55%</div><div class="kpi-cell">≥65%</div><div class="kpi-cell">≥75%</div></div>
+      <div class="kpi-row"><div class="kpi-name">Objective control</div><div class="kpi-cell">≥45%</div><div class="kpi-highlight">≥55%</div><div class="kpi-cell">≥65%</div><div class="kpi-cell">≥75%</div></div>
+      <div class="kpi-row"><div class="kpi-name">First objective %</div><div class="kpi-cell">≥40%</div><div class="kpi-highlight">≥55%</div><div class="kpi-cell">≥65%</div><div class="kpi-cell">≥70%</div></div>
+      <div class="kpi-row"><div class="kpi-name">Vision score/min</div><div class="kpi-cell">≥0.5</div><div class="kpi-highlight">≥0.8</div><div class="kpi-cell">≥1.0</div><div class="kpi-cell">≥1.2</div></div>
+      <div class="kpi-row"><div class="kpi-name">Kill participation</div><div class="kpi-cell">45-60%</div><div class="kpi-highlight">50-65%</div><div class="kpi-cell">55-68%</div><div class="kpi-cell">58-70%</div></div>
+      <div class="kpi-row"><div class="kpi-name">Muertes por game</div><div class="kpi-cell">≤6</div><div class="kpi-highlight">≤5</div><div class="kpi-cell">≤4</div><div class="kpi-cell">≤3</div></div>
+    </div>
+  </div>
+
+  <div class="card card-accent">
+    <strong>Tu chequeo rápido post-partida:</strong> Abre op.gg, busca tu partida, y compara estos 7 números con los targets de "Oro-Platino". Si 5 de los 7 están en verde, vas por el camino correcto. Si menos de 5 → hay un patrón a corregir.
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goTo(7)">← Anterior</button>
+    <button class="nav-btn primary" onclick="goTo(9)">Siguiente: KPIs Propietarios →</button>
+  </div>
+</div>
+
+<!-- PAGE 9: KPIs PROPIETARIOS -->
+<div class="page" id="p9">
+  <div class="chapter-tag">Capítulo 10 — KPIs y Métricas</div>
+  <h1>KPIs<br><em>Propietarios</em></h1>
+  <div class="tag-line">
+    <span>Lo que ningún otro coach mide</span>
+    <span>Métricas invisibles</span>
+    <span>La razón real del estancamiento</span>
+  </div>
+
+  <div class="card card-gold">
+    "Cuando alguien dice 'no entiendo por qué estoy estancado' — aquí está la respuesta. Invisible para el ojo pero visible en los datos."
+  </div>
+
+  <h2>Los 4 KPIs Propietarios</h2>
+
+  <div class="card" style="margin-bottom:10px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+      <strong>Decision Quality Score (DQS)</strong>
+      <span class="pill pill-accent">Target: ≥65%</span>
+    </div>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:6px;">Después de cada partida, anota 5 decisiones mayores y marca cada una como éxito o fracaso. DQS = % de decisiones correctas.</p>
+    <p style="font-size:12px; color:var(--accent); font-style:italic; margin:0;">La métrica más honesta del juego. Un DQS de 70% sostenido en 50 partidas = 58% WR independientemente de tu equipo.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:10px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+      <strong>Path Efficiency Index</strong>
+      <span class="pill pill-accent">Target: Oro +3200, farmeo ≥85%</span>
+    </div>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:6px;">Oro total a los 10min ÷ % de campamentos propios farmeados. Si tu % de farmeo es bajo, estás caminando sin propósito.</p>
+    <p style="font-size:12px; color:var(--accent); font-style:italic; margin:0;">Mide si aprovechas tus campamentos o dejas oro en el mapa.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:10px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+      <strong>Gank ROI</strong>
+      <span class="pill pill-accent">Target: ≥2.0</span>
+    </div>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:6px;">Oro generado por gankeo (kills + asists + plates) ÷ oro perdido en campamentos mientras gankeabas. Si tu ROI es menor a 1.0 — estás perdiendo.</p>
+    <p style="font-size:12px; color:var(--red); font-style:italic; margin:0;">ROI &lt;1.0 = la razón principal de estancamiento. Cada vez que gankeas pierdes valor neto.</p>
+  </div>
+
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+      <strong>Tempo Conversion Rate</strong>
+      <span class="pill pill-accent">Target: ≥60%</span>
+    </div>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:6px;">% de ventajas (kills, flashes forzados, tempo) que conviertes en un objetivo concreto dentro de los 60 segundos siguientes.</p>
+    <p style="font-size:12px; color:var(--accent); font-style:italic; margin:0;">Ganas mucho tempo y no lo conviertes = pierdes de todas formas. Este KPI mide el puente entre ganar y cerrar.</p>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goTo(8)">← Anterior</button>
+    <button class="nav-btn primary" onclick="goTo(10)">Siguiente: Anti-Tilt SOP →</button>
+  </div>
+</div>
+
+<!-- PAGE 10: ANTI-TILT -->
+<div class="page" id="p10">
+  <div class="chapter-tag">Capítulo 11 — KPIs y Métricas</div>
+  <h1>SOP<br><em>Anti-Tilt</em></h1>
+  <div class="tag-line">
+    <span>El capítulo que ningún coach se atreve a escribir</span>
+    <span>Tilt compuesto</span>
+    <span>DQS cae del 65% al 40%</span>
+  </div>
+
+  <div class="card card-red">
+    <strong>Creencia falsa:</strong> "El tilt es para débiles. Yo no me tilteo." Todos nos tilteamos. El jungla es el rol que más blame recibe en el juego. Si el top pierde → jungle diff. Si el mid pierde → jungle diff. Si el bot muere → jungle diff. Recibes presión de 3 líneas simultáneamente.
+  </div>
+
+  <h2>El Tilt Compuesto del Jungla</h2>
+  <p>El tilt del jungla se acumula de <strong>4 fuentes simultáneas</strong>. Un jungla puede llegar a 50% más de tilt en los primeros 10 minutos <em>sin haberse muerto ni una vez</em>.</p>
+
+  <div class="grid2" style="margin:16px 0;">
+    <div class="card"><strong>Top pide ganks</strong><br><span style="font-size:12px;color:var(--muted);">+10% tilt base</span></div>
+    <div class="card"><strong>Mid blame por 50/50</strong><br><span style="font-size:12px;color:var(--muted);">+10% tilt base</span></div>
+    <div class="card"><strong>Bot muere 2v2</strong><br><span style="font-size:12px;color:var(--muted);">+15% tilt base</span></div>
+    <div class="card"><strong>Tu propio error de path o smite</strong><br><span style="font-size:12px;color:var(--muted);">+15% tilt base</span></div>
+  </div>
+
+  <div class="card card-red" style="margin:16px 0;">
+    Con 50% de tilt tus decisiones son <strong>40% peores sin que lo notes</strong>. Tu DQS cae del 65% al 40%. Estás perdiendo partidas por degradación mental que ni reconoces.
+  </div>
+
+  <h2>SOP: Protocolo R.E.S.E.T.</h2>
+  <div class="framework">
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:20px;min-width:20px;color:var(--red)">R</div>
+      <div><div class="fw-title">Reconoce las señales de tilt</div><div class="fw-desc">Haces gankeos impulsivos sin GANK verde. Farmeas sin PATH. Respondes en el chat. Tu pathing se vuelve circular sin propósito.</div></div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:20px;min-width:20px;color:var(--red)">E</div>
+      <div><div class="fw-title">Ejecuta Selective Deafness</div><div class="fw-desc">Mutea el chat desde el inicio de la partida. Cada mensaje tóxico consume 2-3 segundos de atención + 20-30% de tilt acumulado. 10 mensajes = 30 segundos perdidos.</div></div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:20px;min-width:20px;color:var(--red)">S</div>
+      <div><div class="fw-title">Simplifica a lo básico</div><div class="fw-desc">Cuando sientes tilt, vuelve a lo más básico del PATH: ¿cuál es mi próximo campamento? ¿Cuál es mi plan en 60 segundos? Solo eso.</div></div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:20px;min-width:20px;color:var(--red)">E</div>
+      <div><div class="fw-title">Enfócate en tu DQS, no en el marcador</div><div class="fw-desc">No importa si vas perdiendo. ¿Estás tomando decisiones de calidad? Si sí → el resultado largo plazo es positivo. Si no → pausa y resetea.</div></div>
+    </div>
+    <div class="fw-row">
+      <div class="fw-letter" style="font-size:20px;min-width:20px;color:var(--red)">T</div>
+      <div><div class="fw-title">Toma las mejores decisiones disponibles</div><div class="fw-desc">Un DQS de 70% en 50 partidas = 58% WR sostenido. No es culpa del equipo, no es matchup — eres tú subiendo. El largo plazo siempre gana.</div></div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goTo(9)">← Anterior</button>
+    <button class="nav-btn primary" onclick="goTo(11)">Siguiente: Tu Pool →</button>
+  </div>
+</div>
+
+<!-- PAGE 11: POOL -->
+<div class="page" id="p11">
+  <div class="chapter-tag">Capítulo 12 — Tu Pool</div>
+  <h1>Sylas · Viego<br><em>· Diana</em></h1>
+  <div class="tag-line">
+    <span>Patch 16.8</span>
+    <span>Datos de Lolalytics Esmeralda+</span>
+    <span>Habilidades · Combos · Matchups</span>
+  </div>
+
+  <div class="champ-tabs">
+    <button class="champ-tab active" onclick="swChamp('sylas')">Sylas <span class="pill pill-accent" style="margin-left:4px">S-</span></button>
+    <button class="champ-tab" onclick="swChamp('viego')">Viego <span class="pill pill-gold" style="margin-left:4px">B-</span></button>
+    <button class="champ-tab" onclick="swChamp('diana')">Diana <span class="pill pill-green" style="margin-left:4px">S</span></button>
+  </div>
+
+  <!-- SYLAS -->
+  <div class="champ-panel active" id="cp-sylas">
+    <div class="grid2" style="margin-bottom:16px;">
+      <div class="card"><span style="font-size:12px;color:var(--muted)">Win Rate</span><br><strong style="font-size:20px;color:var(--accent)">50.69%</strong></div>
+      <div class="card"><span style="font-size:12px;color:var(--muted)">Rank Esmeralda+</span><br><strong style="font-size:20px;color:var(--text)">8 / 74</strong></div>
+    </div>
+    <h3>Habilidades</h3>
+    <div class="ability-row"><div class="ability-key ak-p">P</div><div><div class="ability-name">Petricite Burst — pasiva AoE</div><div class="ability-desc">Stackea con habilidades. Al 3 cargas: ataque AoE. Restaura HP con W y E.</div><div class="ability-tip">Patrón de clear: habilidades para stackear → ataque AoE para clearear rápido.</div></div></div>
+    <div class="ability-row"><div class="ability-key ak-q">Q</div><div><div class="ability-name">Chain Lash — cadena + slow</div><div class="ability-desc">Dos cadenas en línea recta que se cruzan. Daño y slow en el punto de intersección.</div><div class="ability-tip">Poke inicial en gankeos desde maleza sin revelar posición.</div></div></div>
+    <div class="ability-row"><div class="ability-key ak-w">W</div><div><div class="ability-name">Kingslayer — salto + heal</div><div class="ability-desc">Salta a un enemigo, hace daño y se cura. Más cura si el enemigo tiene HP bajo; más daño si Sylas tiene HP bajo.</div><div class="ability-tip">Principal sustain en jungla. Úsalo cuando el objetivo tiene poca vida para maximizar cura.</div></div></div>
+    <div class="ability-row"><div class="ability-key ak-e">E</div><div><div class="ability-name">Abscond / Abduct — dash + pull</div><div class="ability-desc">E1: dash hacia adelante. E2: cadena que jala al primer enemigo tocado hacia Sylas.</div><div class="ability-tip">Gap closer + CC. En gankeos: E1 para acercarte, E2 para jalar y que el laner conecte CC.</div></div></div>
+    <div class="ability-row"><div class="ability-key ak-r">R</div><div><div class="ability-name">Hijack — robar ult enemigo</div><div class="ability-desc">Roba el ult de un enemigo visible cercano. El enemigo no puede usarlo por unos segundos.</div><div class="ability-tip">En pantalla de carga: identifica qué ult robar. Amumu, Jarvan, Malphite, Sejuani = prioridad máxima.</div></div></div>
+    <h3>Combo de gankeo</h3>
+    <div class="card">
+      <div class="combo-seq">
+        <span class="combo-step">R (roba ult)</span><span class="combo-arrow">→</span>
+        <span class="combo-step">E1 (dash)</span><span class="combo-arrow">→</span>
+        <span class="combo-step">E2 (pull)</span><span class="combo-arrow">→</span>
+        <span class="combo-step">W (salto+dmg)</span><span class="combo-arrow">→</span>
+        <span class="combo-step">Q (slow)</span><span class="combo-arrow">→</span>
+        <span class="combo-step">R (ult robado)</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px;">Sylas depende 100% del CC aliado pre-ult. Si la línea no tiene CC, busca otra.</div>
+    </div>
+    <h3>Matchups — Patch 16.8</h3>
+    <div class="grid2">
+      <div>
+        <div style="font-size:11px;color:var(--red);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Evitar</div>
+        <div class="matchup-list">
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Zaahen</div><div class="mi-reason">Alta movilidad, outfarms</div></div><span class="mi-wr-bad">42%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Elise</div><div class="mi-reason">Te gana 1v1 early, mejor ganker pre-6</div></div><span class="mi-wr-bad">44%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Lillia</div><div class="mi-reason">Te kiteea, outfarmea, no puedes alcanzarla</div></div><span class="mi-wr-bad">45%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Zac</div><div class="mi-reason">Mejor teamfighter sin buen ult robado</div></div><span class="mi-wr-bad">45%</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--accent2);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Favorables</div>
+        <div class="matchup-list">
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Shyvana</div><div class="mi-reason">Su ult es OP al robarlo</div></div><span class="mi-wr-good">57%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Jax</div><div class="mi-reason">Sin movilidad, fácil de jalar con E2</div></div><span class="mi-wr-good">57%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Hecarim</div><div class="mi-reason">Su ult robado es tremendo</div></div><span class="mi-wr-good">55%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Dr. Mundo</div><div class="mi-reason">Sin movilidad real, fácil de jalar</div></div><span class="mi-wr-good">55%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEGO -->
+  <div class="champ-panel" id="cp-viego">
+    <div class="grid2" style="margin-bottom:16px;">
+      <div class="card"><span style="font-size:12px;color:var(--muted)">Win Rate</span><br><strong style="font-size:20px;color:var(--gold)">49.11%</strong></div>
+      <div class="card"><span style="font-size:12px;color:var(--muted)">Rank Esmeralda+</span><br><strong style="font-size:20px;color:var(--text)">42 / 74</strong></div>
+    </div>
+    <div class="card card-gold" style="margin-bottom:16px;font-size:13px;">Viego está en B- este patch. Viable pero exige más. Los mejores players lo llevan a 56.38% WR — tiene skill ceiling muy alto.</div>
+    <h3>Habilidades</h3>
+    <div class="ability-row"><div class="ability-key ak-p">P</div><div><div class="ability-name">Sovereign's Domination — posesión</div><div class="ability-desc">Al matar un enemigo, Viego puede poseerlo temporalmente. Hereda HP proporcional, habilidades básicas y ataques del campeón poseído. Su R se resetea.</div><div class="ability-tip">El core de Viego. Prioriza kills en carries que te den buenas posesiones.</div></div></div>
+    <div class="ability-row"><div class="ability-key ak-q">Q</div><div><div class="ability-name">Blade of the Ruined King — ataque mejorado</div><div class="ability-desc">Pasiva: ataques aplican "Mist". Activa: daño extra basado en la vida máxima del objetivo + slow.</div><div class="ability-tip">Principal fuente de DPS y slow para que no escapen en gankeos.</div></div></div>
+    <div class="ability-row"><div class="ability-key ak-w">W</div><div><div class="ability-name">Spectral Maw — carga + stun</div><div class="ability-desc">Se carga mientras te mueves. Al liberar hace un stun en línea recta. Max carga = 1.5s de stun. Es el gap closer de Viego.</div><div class="ability-tip">Carga la W mientras caminas a la línea. Llegar con W cargada al máximo = 1.5s de stun garantizado.</div></div></div>
+    <div class="ability-row"><div class="ability-key ak-e">E</div><div><div class="ability-name">Harrowed Path — dash en niebla</div><div class="ability-desc">Crea niebla alrededor de una estructura o muro. Dentro: velocidad de ataque + invisible brevemente.</div><div class="ability-tip">Úsala en paredes para acercarte invisible antes del gankeo.</div></div></div>
+    <div class="ability-row"><div class="ability-key ak-r">R</div><div><div class="ability-name">Heartbreaker — salto + ejecución</div><div class="ability-desc">Salta a un área, rechaza a todos excepto al de HP más bajo. Golpea ese objetivo con daño escalado a su HP faltante. Se resetea con la pasiva.</div><div class="ability-tip">R→posesión→R2 es la secuencia ideal en teamfights.</div></div></div>
+    <h3>Combo de gankeo</h3>
+    <div class="card">
+      <div class="combo-seq">
+        <span class="combo-step">E (pared → invis)</span><span class="combo-arrow">→</span>
+        <span class="combo-step">W cargado (stun)</span><span class="combo-arrow">→</span>
+        <span class="combo-step">Q (slow+dmg)</span><span class="combo-arrow">→</span>
+        <span class="combo-step">AA+Q</span><span class="combo-arrow">→</span>
+        <span class="combo-step">R (si HP bajo)</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px;">El factor clave siempre es la posesión. Prioriza carries con buenas posesiones sobre kills fáciles en tanks.</div>
+    </div>
+    <h3>Matchups — Patch 16.8</h3>
+    <div class="grid2">
+      <div>
+        <div style="font-size:11px;color:var(--red);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Evitar</div>
+        <div class="matchup-list">
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Qiyana</div><div class="mi-reason">Te outduels, demasiada movilidad</div></div><span class="mi-wr-bad">43%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Nidalee</div><div class="mi-reason">Te kiteea, outfarmea, outganks</div></div><span class="mi-wr-bad">43%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Fizz</div><div class="mi-reason">Su E niega tu W — esquiva todo tu daño</div></div><span class="mi-wr-bad">44%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Fiddlesticks</div><div class="mi-reason">Su CC interrumpe todas tus secuencias</div></div><span class="mi-wr-bad">47%</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--accent2);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Favorables</div>
+        <div class="matchup-list">
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Gwen</div><div class="mi-reason">Lenta, sin burst, posesión muy valiosa</div></div><span class="mi-wr-good">57%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Karthus</div><div class="mi-reason">Kill fácil + posesión con R global</div></div><span class="mi-wr-good">55%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Dr. Mundo</div><div class="mi-reason">Sin movilidad real, posesión útil</div></div><span class="mi-wr-good">56%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Shen</div><div class="mi-reason">Lento, posesión con TP global</div></div><span class="mi-wr-good">55%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIANA -->
+  <div class="champ-panel" id="cp-diana">
+    <div class="grid2" style="margin-bottom:16px;">
+      <div class="card"><span style="font-size:12px;color:var(--muted)">Win Rate</span><br><strong style="font-size:20px;color:var(--accent2)">51.39%</strong></div>
+      <div class="card"><span style="font-size:12px;color:var(--muted)">Rank Esmeralda+</span><br><strong style="font-size:20px;color:var(--text)">4 / 74</strong></div>
+    </div>
+    <h3>Habilidades</h3>
+    <div class="ability-row"><div class="ability-key ak-p">P</div><div><div class="ability-name">Moonsilver Blade — pasiva AoE + velocidad de ataque</div><div class="ability-desc">Cada 3 ataques básicos Diana hace AoE de daño mágico. Al usar una habilidad el contador resetea a 2. Gana velocidad de ataque pasiva.</div><div class="ability-tip">Patrón óptimo de clear: AA→AA→habilidad→AA (AoE).</div></div></div>
+    <div class="ability-row"><div class="ability-key ak-q">Q</div><div><div class="ability-name">Crescent Strike — arco curvo + marca Moonlight</div><div class="ability-desc">Lanza un arco curvo que hace daño y aplica Moonlight a los enemigos golpeados por 3 segundos. Necesaria para activar la E.</div><div class="ability-tip">El skillshot más crítico. Sin Q no hay E. Lánzala desde maleza para iniciar sin ser visto.</div></div></div>
+    <div class="ability-row"><div class="ability-key ak-w">W</div><div><div class="ability-name">Pale Cascade — escudo + orbes</div><div class="ability-desc">3 orbes que orbitan a Diana y dañan al contacto. Al final otorga un escudo. Si los 3 explotan antes: escudo mayor.</div><div class="ability-tip">Actívala al entrar al gankeo para absorber daño y maximizar el escudo.</div></div></div>
+    <div class="ability-row"><div class="ability-key ak-e">E</div><div><div class="ability-name">Lunar Rush — dash hacia objetivo marcado por Q</div><div class="ability-desc">Dash instantáneo hacia un enemigo con Moonlight (marcado por Q). Si hay varios marcados puedes usarla varias veces.</div><div class="ability-tip">Solo funciona si la Q marcó antes. Pre-6 este es tu único gap closer — úsalo solo cuando la Q ya golpeó.</div></div></div>
+    <div class="ability-row"><div class="ability-key ak-r">R</div><div><div class="ability-name">Moonfall — dos activaciones</div><div class="ability-desc">R1 (pre-6): jala enemigos cercanos. R2 (post-6): después de usar E, knockup + daño masivo en área.</div><div class="ability-tip">Combo post-6: Q→E→R2. El R2 requiere haber usado E justo antes. Sin E no hay R2.</div></div></div>
+    <h3>Combo principal — post nivel 6</h3>
+    <div class="card">
+      <div class="combo-seq">
+        <span class="combo-step">W (escudo)</span><span class="combo-arrow">→</span>
+        <span class="combo-step">Q (marcar)</span><span class="combo-arrow">→</span>
+        <span class="combo-step">E (dash al marcado)</span><span class="combo-arrow">→</span>
+        <span class="combo-step">R2 (knockup+burst)</span><span class="combo-arrow">→</span>
+        <span class="combo-step">AA×3 (pasiva AoE)</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px;">Pre-6: W→Q→E→AA sin R2. Post-6 Diana es S tier — casi cualquier squishy sin movilidad muere en este combo.</div>
+    </div>
+    <h3>Matchups — Patch 16.8</h3>
+    <div class="grid2">
+      <div>
+        <div style="font-size:11px;color:var(--red);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Evitar</div>
+        <div class="matchup-list">
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Volibear</div><div class="mi-reason">Tankea todo el combo y contraataca</div></div><span class="mi-wr-bad">42%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Talon</div><div class="mi-reason">Te bursts antes de que completes el combo</div></div><span class="mi-wr-bad">44%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Nocturne</div><div class="mi-reason">Su E bloquea tu Q — sin marca, sin E, sin R2</div></div><span class="mi-wr-bad">46%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Nunu</div><div class="mi-reason">Outfarmea y CC interrumpe el combo</div></div><span class="mi-wr-bad">47%</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--accent2);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Favorables</div>
+        <div class="matchup-list">
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Nidalee</div><div class="mi-reason">La matas facilísimo — squishy puro</div></div><span class="mi-wr-good">62%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Ekko</div><div class="mi-reason">Similar kit pero Diana gana el 1v1</div></div><span class="mi-wr-good">57%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Sylas</div><div class="mi-reason">Diana le gana al 1v1 a Sylas (dato útil de tu pool)</div></div><span class="mi-wr-good">56%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Lillia</div><div class="mi-reason">La alcanzas con E, combo cierra rápido</div></div><span class="mi-wr-good">54%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goTo(10)">← Anterior</button>
+    <button class="nav-btn primary" onclick="goTo(12)">Siguiente: Evaluador de Gankeo →</button>
+  </div>
+</div>
+
+<!-- PAGE 12: EVALUADOR INTERACTIVO -->
+<div class="page" id="p12">
+  <div class="chapter-tag">Capítulo 13 — Herramienta</div>
+  <h1><em>Evaluador</em><br>de Gankeo</h1>
+  <div class="tag-line">
+    <span>Interactivo</span>
+    <span>Calibrado por campeón</span>
+    <span>Úsalo en pantalla de carga</span>
+  </div>
+
+  <div class="champ-tabs">
+    <button class="champ-tab active" onclick="swGank('sylas')">Sylas</button>
+    <button class="champ-tab" onclick="swGank('viego')">Viego</button>
+    <button class="champ-tab" onclick="swGank('diana')">Diana</button>
+  </div>
+
+  <div id="gp-sylas">
+    <div class="gank-grid">
+      <div class="gank-factor" onclick="tg(this,'sg','g')"><div><span class="gf-dot"></span><span class="gf-label">G — ¿Puedes jalar con E2?</span></div><div class="gf-sub">¿El enemigo está en rango de tu cadena E2?</div></div>
+      <div class="gank-factor" onclick="tg(this,'sg','a')"><div><span class="gf-dot"></span><span class="gf-label">A — ¿Tu laner tiene CC?</span></div><div class="gf-sub">Sylas no tiene CC propio — depende del laner</div></div>
+      <div class="gank-factor" onclick="tg(this,'sg','n')"><div><span class="gf-dot"></span><span class="gf-label">N — ¿2v1 confirmado?</span></div><div class="gf-sub">¿Enemigo trackeado lejos? ¿Segundo enemigo fuera?</div></div>
+      <div class="gank-factor" onclick="tg(this,'sg','k')"><div><span class="gf-dot"></span><span class="gf-label">K — ¿Enemigo &lt;60% o sin flash?</span></div><div class="gf-sub">Sin ult el burst de Sylas es moderado en early</div></div>
+    </div>
+    <div class="verdict v-wait" id="verd-sg">Evalúa los 4 factores — click = verde, click×2 = rojo, click×3 = resetea.</div>
+  </div>
+
+  <div id="gp-viego" style="display:none">
+    <div class="gank-grid">
+      <div class="gank-factor" onclick="tg(this,'vg','g')"><div><span class="gf-dot"></span><span class="gf-label">G — ¿W cargada disponible?</span></div><div class="gf-sub">El stun de W es tu único gap closer + CC</div></div>
+      <div class="gank-factor" onclick="tg(this,'vg','a')"><div><span class="gf-dot"></span><span class="gf-label">A — ¿Enemigo bajo HP o aislado?</span></div><div class="gf-sub">HP bajo = posesión posible — prioridad máxima</div></div>
+      <div class="gank-factor" onclick="tg(this,'vg','n')"><div><span class="gf-dot"></span><span class="gf-label">N — ¿2v1 o puedes 1v1?</span></div><div class="gf-sub">Viego 1v1 pre-items es débil</div></div>
+      <div class="gank-factor" onclick="tg(this,'vg','k')"><div><span class="gf-dot"></span><span class="gf-label">K — ¿Es un carry que puedes poseer?</span></div><div class="gf-sub">Si la posesión genera valor extra, baja el threshold</div></div>
+    </div>
+    <div class="verdict v-wait" id="verd-vg">Evalúa los 4 factores.</div>
+  </div>
+
+  <div id="gp-diana" style="display:none">
+    <div class="gank-grid">
+      <div class="gank-factor" onclick="tg(this,'dg','g')"><div><span class="gf-dot"></span><span class="gf-label">G — ¿Puedes aterrizarle la Q?</span></div><div class="gf-sub">Sin Q marcada no hay E. ¿El enemigo está quieto o slow?</div></div>
+      <div class="gank-factor" onclick="tg(this,'dg','a')"><div><span class="gf-dot"></span><span class="gf-label">A — ¿Tienes nivel 6 (R2)?</span></div><div class="gf-sub">Post-6: autosuficiente vs squishies. Pre-6: necesita CC aliado.</div></div>
+      <div class="gank-factor" onclick="tg(this,'dg','n')"><div><span class="gf-dot"></span><span class="gf-label">N — ¿El enemigo no tiene movilidad?</span></div><div class="gf-sub">Yasuo, Zed, Irelia con E active = escape del combo</div></div>
+      <div class="gank-factor" onclick="tg(this,'dg','k')"><div><span class="gf-dot"></span><span class="gf-label">K — ¿Es squishy o sin flash?</span></div><div class="gf-sub">El combo Q→E→R2 mata squishies en &lt;3 segundos</div></div>
+    </div>
+    <div class="verdict v-wait" id="verd-dg">Evalúa los 4 factores.</div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goTo(11)">← Anterior</button>
+    <button class="nav-btn primary" onclick="goTo(13)">Siguiente: Matchups y Composiciones →</button>
+  </div>
+</div>
+
+<!-- PAGE 13: MATCHUPS Y COMPOSICIONES -->
+<div class="page" id="p13">
+  <div class="chapter-tag">Capítulo 14 — Matchups y Composiciones</div>
+  <h1><em>Matchups</em> y<br>Composiciones</h1>
+  <div class="tag-line">
+    <span>Patch 16.8 · Lolalytics Esmeralda+</span>
+    <span>Counters por rol</span>
+    <span>Comps ideales para tu pool</span>
+  </div>
+
+  <p>Acá están los matchups completos (jungla vs jungla, vs mid, vs top, vs bot, vs support) y las composiciones de equipo que mejor funcionan con cada uno de tus 3 campeones. Click en las tabs para cambiar de campeón.</p>
+
+  <div class="champ-tabs" id="comp-tabs">
+    <button class="champ-tab active" onclick="swComp('sylas')">Sylas</button>
+    <button class="champ-tab" onclick="swComp('viego')">Viego</button>
+    <button class="champ-tab" onclick="swComp('diana')">Diana</button>
+  </div>
+
+  <!-- ==================== SYLAS ==================== -->
+  <div class="champ-panel active" id="comp-sylas">
+
+    <h2>Matchups jungla vs jungla</h2>
+    <div class="grid2">
+      <div>
+        <div style="font-size:11px;color:var(--red);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Counters — no pickees Sylas</div>
+        <div class="matchup-list">
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Zaahen</div><div class="mi-reason">Alta movilidad, te outfarmea y te esquiva el E2</div></div><span class="mi-wr-bad">41%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Zac</div><div class="mi-reason">Mejor teamfighter, si no le robas buen ult perdiste</div></div><span class="mi-wr-bad">44%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Shaco</div><div class="mi-reason">Te invade, te counterjunglea, no lo puedes trackear</div></div><span class="mi-wr-bad">45%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Elise</div><div class="mi-reason">Te gana el 1v1 early, mejor ganker pre-6</div></div><span class="mi-wr-bad">45%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Lillia</div><div class="mi-reason">Te kiteea infinitamente, jamás la alcanzas</div></div><span class="mi-wr-bad">45%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Nunu</div><div class="mi-reason">Outfarmea, objetivos gratis, te ignora</div></div><span class="mi-wr-bad">46%</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--accent2);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Favorables — pickea Sylas</div>
+        <div class="matchup-list">
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Shyvana</div><div class="mi-reason">Su ult robado es S tier, la matas fácil pre-6</div></div><span class="mi-wr-good">57%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Jax</div><div class="mi-reason">Sin movilidad real, E2 lo jala fácil</div></div><span class="mi-wr-good">57%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Talon</div><div class="mi-reason">Lo outdueleas en 1v1 después de lvl 3</div></div><span class="mi-wr-good">56%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Hecarim</div><div class="mi-reason">Su ult robado (fear + carga) es brutal</div></div><span class="mi-wr-good">55%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Zed</div><div class="mi-reason">Ult inútil para robar pero le ganas 1v1 con W heal</div></div><span class="mi-wr-good">55%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Dr. Mundo</div><div class="mi-reason">Sin CC, sin movilidad, free kill</div></div><span class="mi-wr-good">55%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <h2>Matchups vs laners enemigos</h2>
+    <div class="card card-accent" style="margin-bottom:12px;">
+      <strong>Mid enemigos que Sylas destroza:</strong> Aurora (58%), Orianna (57%), Ryze (57%), Qiyana (56%), Cassiopeia (55%). Estos tienen ults que vale la pena robar y son relativamente gankeables.
+    </div>
+    <div class="card card-red" style="margin-bottom:12px;">
+      <strong>Mid enemigos peligrosos:</strong> Anivia (44%), Diana (44%), Sion (44%), LeBlanc (46%), Aurelion Sol (46%). Mucho rango, wave clear infinito, difíciles de gankear.
+    </div>
+
+    <h2>Composiciones ideales para Sylas</h2>
+    <p>La clave de Sylas es que <em>necesita CC aliado</em> porque no tiene CC propio en early, y necesita <em>ults enemigos valiosos para robar</em>. La comp ideal le da chain CC y lo pone contra equipos con ults poderosos.</p>
+
+    <h3>Supports que amplifican a Sylas</h3>
+    <div class="grid3" style="margin-bottom:16px;">
+      <div class="card card-accent" style="text-align:center;">
+        <strong>Leona</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Chain CC brutal — E+Q de Leona → E2 pull de Sylas → kill garantizada. El mejor soporte para Sylas.</div>
+      </div>
+      <div class="card card-accent" style="text-align:center;">
+        <strong>Nautilus</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Hook + root pasivo + R knockup. El enemigo no se mueve por 3 segundos. Más que suficiente para Sylas.</div>
+      </div>
+      <div class="card card-accent" style="text-align:center;">
+        <strong>Thresh / Rell</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Engage + CC duro + peel. Lantern de Thresh saca a Sylas de situaciones malas post-dive.</div>
+      </div>
+    </div>
+
+    <h3>Toplanes que complementan a Sylas</h3>
+    <div class="grid3" style="margin-bottom:16px;">
+      <div class="card" style="text-align:center;">
+        <strong>Malphite</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Doble ult en teamfight — el ult original de Malphite + el que Sylas le roba al top/jg enemigo.</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <strong>Ornn</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Engage largo + CC chain. Ornn R → Sylas entra → W heal → ult robado para cerrar.</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <strong>Jarvan IV</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Cataclysm encierra al enemigo → Sylas tira el ult robado adentro. Si además robas un ult AoE = gg.</div>
+      </div>
+    </div>
+
+    <h3>Los ults más valiosos para robar</h3>
+    <table class="data-table">
+      <thead><tr><th>Ult</th><th>Valor</th><th>Por qué</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill pill-accent">Amumu</span></td><td><span class="pill pill-green">S+</span></td><td>AoE stun masivo — Sylas se convierte en el mejor iniciador del juego</td></tr>
+        <tr><td><span class="pill pill-accent">Malphite</span></td><td><span class="pill pill-green">S+</span></td><td>Engage perfecto — dash + AoE knockup. Sylas puede iniciar desde lejos</td></tr>
+        <tr><td><span class="pill pill-accent">Jarvan IV</span></td><td><span class="pill pill-green">S</span></td><td>Cataclysm encierra — perfecto para combinar con AoE de tu equipo</td></tr>
+        <tr><td><span class="pill pill-accent">Sejuani</span></td><td><span class="pill pill-green">S</span></td><td>AoE stun gigante en teamfight. Brutal con cualquier equipo</td></tr>
+        <tr><td><span class="pill pill-accent">Hecarim</span></td><td><span class="pill pill-gold">A+</span></td><td>Fear + carga — engage agresivo que Sylas no tiene naturalmente</td></tr>
+        <tr><td><span class="pill pill-accent">Shyvana</span></td><td><span class="pill pill-gold">A+</span></td><td>Dash largo + daño — excelente engage cuando Sylas no tiene mejor opción</td></tr>
+        <tr><td><span class="pill pill-accent">Orianna</span></td><td><span class="pill pill-gold">A</span></td><td>AoE pull + daño — funciona increíble si Sylas entra al centro del teamfight</td></tr>
+      </tbody>
+    </table>
+
+    <div class="highlight">"En pantalla de carga: identifica el ult más valioso del equipo enemigo. Si tienen Amumu, Malphite o Sejuani, Sylas automáticamente vale el doble que cualquier otro jungla."</div>
+  </div>
+
+  <!-- ==================== VIEGO ==================== -->
+  <div class="champ-panel" id="comp-viego">
+
+    <h2>Matchups jungla vs jungla</h2>
+    <div class="grid2">
+      <div>
+        <div style="font-size:11px;color:var(--red);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Counters — no pickees Viego</div>
+        <div class="matchup-list">
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Qiyana</div><div class="mi-reason">Te outduels fácil, demasiada movilidad</div></div><span class="mi-wr-bad">43%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Nidalee</div><div class="mi-reason">Te kiteea, outfarmea, outganks early</div></div><span class="mi-wr-bad">43%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Fizz</div><div class="mi-reason">Su E niega tu W — esquiva todo tu daño</div></div><span class="mi-wr-bad">44%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Zaahen</div><div class="mi-reason">Nuevo campeón, alta movilidad, outplays</div></div><span class="mi-wr-bad">46%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Fiddlesticks</div><div class="mi-reason">Su fear te interrumpe todo, ult de teamfight > el tuyo</div></div><span class="mi-wr-bad">47%</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--accent2);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Favorables — pickea Viego</div>
+        <div class="matchup-list">
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Gwen</div><div class="mi-reason">Lenta, sin burst, posesión muy valiosa</div></div><span class="mi-wr-good">57%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Dr. Mundo</div><div class="mi-reason">Sin movilidad, fácil de stunear con W</div></div><span class="mi-wr-good">56%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Karthus</div><div class="mi-reason">Kill fácil + posesión con R global es brutal</div></div><span class="mi-wr-good">55%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Shen</div><div class="mi-reason">Lento, fácil de stunear, posesión con TP</div></div><span class="mi-wr-good">55%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Shyvana</div><div class="mi-reason">Sin CC, la matas fácil</div></div><span class="mi-wr-good">54%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <h2>Composiciones ideales para Viego</h2>
+    <p>Viego necesita una cosa: <em>que alguien más inicie la pelea</em>. Viego no es un iniciador — es un <em>cleaner</em>. Entra después del engage aliado, posee al primer kill, y reinicia el teamfight desde adentro.</p>
+
+    <h3>Supports que amplifican a Viego</h3>
+    <div class="grid3" style="margin-bottom:16px;">
+      <div class="card card-accent" style="text-align:center;">
+        <strong>Leona</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Engage duro → Viego entra con W stun → kill → posesión. La secuencia perfecta para Viego.</div>
+      </div>
+      <div class="card card-accent" style="text-align:center;">
+        <strong>Nautilus</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">R point-and-click knockup → el carry enemigo está inmóvil → Viego W + Q + R para ejecutar.</div>
+      </div>
+      <div class="card card-accent" style="text-align:center;">
+        <strong>Alistar</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Pulverize + Headbutt desplaza carries al frente → Viego los atrapa fácil con W.</div>
+      </div>
+    </div>
+
+    <h3>Toplanes que complementan a Viego</h3>
+    <div class="grid3" style="margin-bottom:16px;">
+      <div class="card" style="text-align:center;">
+        <strong>Malphite</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Malphite R inicia → Viego entra 1s después con R sobre el carry con HP más bajo → posesión → chain kill.</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <strong>Kennen</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Kennen R stun en zona → Viego ejecuta al más bajo → posesión dentro del AoE de Kennen. Brutal.</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <strong>Sion / Ornn</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Tanks con engage largo que absorben el foco → Viego entra por el flanco con E invisible y limpia.</div>
+      </div>
+    </div>
+
+    <h3>Las posesiones más valiosas</h3>
+    <table class="data-table">
+      <thead><tr><th>Campeón</th><th>Valor al poseerlo</th><th>Por qué</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill pill-accent">Karthus</span></td><td><span class="pill pill-green">S+</span></td><td>Posesión → R global con HP del Karthus muerto. Puede matar a todo el equipo.</td></tr>
+        <tr><td><span class="pill pill-accent">ADC fed</span></td><td><span class="pill pill-green">S+</span></td><td>Heredas su daño + items por 10s. Un ADC fed poseído es un teamfight gratis.</td></tr>
+        <tr><td><span class="pill pill-accent">Mage con burst</span></td><td><span class="pill pill-green">S</span></td><td>Syndra, Vex, Viktor — sus combos con las ratios de Viego limpian peleas.</td></tr>
+        <tr><td><span class="pill pill-accent">Bruiser con CC</span></td><td><span class="pill pill-gold">A+</span></td><td>Jax, Darius, Renekton — ganas sustain y CC que Viego no tiene naturalmente.</td></tr>
+        <tr><td><span class="pill pill-accent">Tank puro</span></td><td><span class="pill pill-gold">A</span></td><td>Menos ideal pero te da HP y CC para sobrevivir y esperar tu R reset.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="highlight">"Viego no inicia teamfights — las limpia. Si tu equipo no tiene un iniciador (Malphite, Leona, Ornn), Viego pierde mucho valor. Siempre asegúrate de que al menos 2 aliados tengan engage."</div>
+  </div>
+
+  <!-- ==================== DIANA ==================== -->
+  <div class="champ-panel" id="comp-diana">
+
+    <h2>Matchups jungla vs jungla</h2>
+    <div class="grid2">
+      <div>
+        <div style="font-size:11px;color:var(--red);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Counters — no pickees Diana</div>
+        <div class="matchup-list">
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Volibear</div><div class="mi-reason">Tankea todo tu combo y te mata — imposible de matear</div></div><span class="mi-wr-bad">42%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Talon</div><div class="mi-reason">Te bursts antes de que completes Q→E→R2</div></div><span class="mi-wr-bad">44%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Nocturne</div><div class="mi-reason">E bloquea tu Q — sin Q no hay E, sin E no hay R2. Tu combo entero desactivado.</div></div><span class="mi-wr-bad">46%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Nunu</div><div class="mi-reason">Te outfarmea, outrotatea, y su CC interrumpe tu combo</div></div><span class="mi-wr-bad">47%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Elise</div><div class="mi-reason">Te invade early cuando eres más débil (pre-6)</div></div><span class="mi-wr-bad">47%</span></div>
+          <div class="matchup-item mi-bad"><div><div class="mi-name-bad">Briar</div><div class="mi-reason">Te engage antes de que puedas combear, lifesteal te outlive</div></div><span class="mi-wr-bad">48%</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--accent2);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Favorables — pickea Diana</div>
+        <div class="matchup-list">
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Nidalee</div><div class="mi-reason">Squishy pura — un combo Q→E→R2 y está muerta</div></div><span class="mi-wr-good">62%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Ekko</div><div class="mi-reason">Kit similar pero Diana le gana el 1v1 siempre</div></div><span class="mi-wr-good">57%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Sylas</div><div class="mi-reason">Diana le gana a Sylas — dato clave de tu pool</div></div><span class="mi-wr-good">56%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Rengar</div><div class="mi-reason">Si salta encima: W shield + R2 lo mata antes</div></div><span class="mi-wr-good">55%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Dr. Mundo</div><div class="mi-reason">Sin movilidad, sin CC, Diana lo funde</div></div><span class="mi-wr-good">54%</span></div>
+          <div class="matchup-item mi-good"><div><div class="mi-name-good">Lillia</div><div class="mi-reason">La alcanzas con E y el combo cierra rápido</div></div><span class="mi-wr-good">54%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <h2>Composiciones ideales para Diana</h2>
+    <p>Diana es una <em>teamfighter AoE</em>. Su R2 es un knockup gigante — mientras más enemigos puedas agrupar con el R2, más valor genera. La composición ideal tiene campeones que <em>agrupan al equipo enemigo</em> o que siguen tu engage con más AoE.</p>
+
+    <h3>Supports que amplifican a Diana</h3>
+    <div class="grid3" style="margin-bottom:16px;">
+      <div class="card card-accent" style="text-align:center;">
+        <strong>Leona</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Leona R → enemigos stunned → Diana Q→E→R2 encima de los stunned. Combo wombo letal.</div>
+      </div>
+      <div class="card card-accent" style="text-align:center;">
+        <strong>Rell</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">W engage + E pull los agrupa → Diana R2 los vuela a todos. El mejor AoE combo posible.</div>
+      </div>
+      <div class="card card-accent" style="text-align:center;">
+        <strong>Amumu</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Amumu R stun AoE → Diana R2 knockup encima. Si los dos ults tocan 3+ enemigos = ace instantáneo.</div>
+      </div>
+    </div>
+
+    <h3>Toplanes que complementan a Diana</h3>
+    <div class="grid3" style="margin-bottom:16px;">
+      <div class="card" style="text-align:center;">
+        <strong>Malphite</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">El duo AoE más clásico del juego. Malphite R → Diana R2 = double knockup en el mismo grupo.</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <strong>Kennen</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Kennen TP + R → Diana Q→E→R2 en la misma zona. AoE overload que derrite cualquier equipo.</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <strong>Ornn</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Ornn R agrupa → Diana entra → R2 knockup en el grupo. Además Ornn te mejora items.</div>
+      </div>
+    </div>
+
+    <h3>Midlaners que hacen wombo combo con Diana</h3>
+    <div class="grid3" style="margin-bottom:16px;">
+      <div class="card card-gold" style="text-align:center;">
+        <strong>Orianna</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Ori pone bola en Diana → Diana Q→E al grupo enemigo → Ori R pull + Diana R2. El mejor wombo combo del juego.</div>
+      </div>
+      <div class="card card-gold" style="text-align:center;">
+        <strong>Yasuo</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Diana R2 es knockup = Yasuo R gratis. Después del R2 de Diana, Yasuo ultea a todo el equipo en el aire.</div>
+      </div>
+      <div class="card card-gold" style="text-align:center;">
+        <strong>Viktor / Brand</strong>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">AoE damage dealers que se benefician de que Diana agrupe. Los enemigos no pueden salir del combo.</div>
+      </div>
+    </div>
+
+    <div class="highlight">"Diana + Orianna + Malphite es posiblemente el wombo combo más fuerte del juego en soloQ. Si tu equipo tiene 2 de esos 3, el teamfight escala exponencialmente."</div>
+  </div>
+
+  <!-- ==================== CUÁNDO PICKEAR CADA UNO ==================== -->
+  <h2 style="margin-top:36px;">Cuándo pickear cada uno</h2>
+  <p>Esta tabla resume la decisión de pick basada en lo que ves en la pantalla de selección — enemigos y aliados.</p>
+
+  <table class="data-table">
+    <thead>
+      <tr><th>Situación en champ select</th><th>Pick</th><th>Por qué</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Enemigos tienen ults fuertes (Amumu, Malphite, Sejuani, Hecarim)</td>
+        <td><span class="pill pill-accent">Sylas</span></td>
+        <td>Su R roba esas ults — se convierte en doble iniciador</td>
+      </tr>
+      <tr>
+        <td>Enemigos tienen carries squishy sin escudos (Jinx, Karthus, Syndra)</td>
+        <td><span class="pill pill-gold">Viego</span></td>
+        <td>Targets jugosos para poseer + kill pressure constante</td>
+      </tr>
+      <tr>
+        <td>Tu equipo necesita AoE e iniciación + tu equipo tiene otro engage</td>
+        <td><span class="pill pill-green">Diana</span></td>
+        <td>R2 es el mejor initiate AoE del juego</td>
+      </tr>
+      <tr>
+        <td>Jungler enemigo es Zac, Elise, Lillia o Shaco</td>
+        <td><span class="pill pill-green">Diana</span> o <span class="pill pill-gold">Viego</span></td>
+        <td>Sylas countered por todos ellos — evitar</td>
+      </tr>
+      <tr>
+        <td>Jungler enemigo es Qiyana, Nidalee o Fizz</td>
+        <td><span class="pill pill-accent">Sylas</span> o <span class="pill pill-green">Diana</span></td>
+        <td>Viego countered por los 3 — evitar</td>
+      </tr>
+      <tr>
+        <td>Jungler enemigo es Volibear, Talon o Nocturne</td>
+        <td><span class="pill pill-accent">Sylas</span> o <span class="pill pill-gold">Viego</span></td>
+        <td>Diana countered — especialmente Nocturne que bloquea toda su Q</td>
+      </tr>
+      <tr>
+        <td>Tienes Leona / Nautilus / Thresh support</td>
+        <td><span class="pill pill-accent">Sylas</span></td>
+        <td>CC aliado compensa la debilidad de Sylas en CC propio</td>
+      </tr>
+      <tr>
+        <td>Tienes Orianna mid o Yasuo mid</td>
+        <td><span class="pill pill-green">Diana</span></td>
+        <td>Wombo combo — Diana R2 habilita el ult de Ori o Yasuo para el ace</td>
+      </tr>
+      <tr>
+        <td>Tu equipo no tiene engage y tú eres el único iniciador</td>
+        <td><span class="pill pill-green">Diana</span></td>
+        <td>Diana puede iniciar sola con Q→E→R2. Viego y Sylas no pueden iniciar</td>
+      </tr>
+      <tr>
+        <td>No tienes idea de qué jugar</td>
+        <td><span class="pill pill-green">Diana</span></td>
+        <td>S tier, más consistente, menos dependiente de aliados y matchups</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goTo(12)">← Anterior</button>
+    <button class="nav-btn primary" onclick="goTo(14)">Siguiente: KPI Tracker →</button>
+  </div>
+</div>
+
+<!-- PAGE 14: KPI TRACKER -->
+<div class="page" id="p14">
+  <div class="chapter-tag">Capítulo 15 — Herramienta</div>
+  <h1><em>KPI</em><br>Tracker</h1>
+  <div class="tag-line">
+    <span>Funciona offline</span>
+    <span>Sin necesidad de Claude</span>
+    <span>Datos guardados en tu navegador</span>
+  </div>
+
+  <p>Registra tus partidas acá después de jugar. Los datos se guardan en tu navegador — no se borran al cerrar la página, no necesitas cuenta, no necesitas créditos. Solo abre la web y registra.</p>
+
+  <!-- INPUT FORM -->
+  <div class="card" style="margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+      <span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;"></span>
+      <span style="font-size:14px;font-weight:600;color:var(--text);">Registrar partida</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
+      <div>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Campeón</label>
+        <select id="kpi-champ" style="width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:Figtree,sans-serif;font-size:13px;">
+          <option value="Sylas">Sylas</option>
+          <option value="Viego">Viego</option>
+          <option value="Diana">Diana</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Resultado</label>
+        <select id="kpi-result" style="width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:Figtree,sans-serif;font-size:13px;">
+          <option value="W">Victoria</option>
+          <option value="L">Derrota</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Jungler enemigo</label>
+        <input id="kpi-enemy" type="text" placeholder="ej: Lee Sin" style="width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:Figtree,sans-serif;font-size:13px;">
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px;">
+      <div>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">CS/min</label>
+        <input id="kpi-cs" type="number" step="0.1" min="0" max="15" placeholder="5.5" style="width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:Figtree,sans-serif;font-size:13px;">
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Muertes</label>
+        <input id="kpi-deaths" type="number" min="0" max="30" placeholder="4" style="width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:Figtree,sans-serif;font-size:13px;">
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Kill Part. %</label>
+        <input id="kpi-kp" type="number" min="0" max="100" placeholder="55" style="width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:Figtree,sans-serif;font-size:13px;">
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Vis. Score/m</label>
+        <input id="kpi-vision" type="number" step="0.1" min="0" max="5" placeholder="0.8" style="width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:Figtree,sans-serif;font-size:13px;">
+      </div>
+      <div>
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Duración (m)</label>
+        <input id="kpi-duration" type="number" min="5" max="90" placeholder="28" style="width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:Figtree,sans-serif;font-size:13px;">
+      </div>
+    </div>
+
+    <!-- DQS SECTION -->
+    <div style="margin-bottom:14px;">
+      <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:6px;">Decision Quality Score — marca las decisiones que tomaste bien</label>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;" id="dqs-grid">
+        <div class="dqs-btn" onclick="toggleDqs(this)" style="padding:8px;border-radius:7px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;text-align:center;font-size:11px;color:var(--muted);transition:all 0.15s;" data-val="0">
+          Decisión 1
+        </div>
+        <div class="dqs-btn" onclick="toggleDqs(this)" style="padding:8px;border-radius:7px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;text-align:center;font-size:11px;color:var(--muted);transition:all 0.15s;" data-val="0">
+          Decisión 2
+        </div>
+        <div class="dqs-btn" onclick="toggleDqs(this)" style="padding:8px;border-radius:7px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;text-align:center;font-size:11px;color:var(--muted);transition:all 0.15s;" data-val="0">
+          Decisión 3
+        </div>
+        <div class="dqs-btn" onclick="toggleDqs(this)" style="padding:8px;border-radius:7px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;text-align:center;font-size:11px;color:var(--muted);transition:all 0.15s;" data-val="0">
+          Decisión 4
+        </div>
+        <div class="dqs-btn" onclick="toggleDqs(this)" style="padding:8px;border-radius:7px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;text-align:center;font-size:11px;color:var(--muted);transition:all 0.15s;" data-val="0">
+          Decisión 5
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;">Notas (opcional)</label>
+      <input id="kpi-notes" type="text" placeholder="ej: gankeé sin GANK verde, perdí 3 camps" style="width:100%;padding:8px 10px;background:var(--surface2);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:Figtree,sans-serif;font-size:13px;">
+    </div>
+
+    <button onclick="saveGame()" style="margin-top:14px;width:100%;padding:10px;border-radius:8px;background:var(--accent);color:#0e0f13;border:none;font-family:Figtree,sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.15s;">
+      Guardar partida
+    </button>
+    <div id="save-feedback" style="display:none;margin-top:8px;padding:8px 12px;border-radius:7px;background:rgba(90,245,192,0.1);border:1px solid rgba(90,245,192,0.25);color:var(--accent2);font-size:12px;text-align:center;"></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <h2>Dashboard de KPIs</h2>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Tus promedios vs los targets de Oro-Platino. Los números se actualizan automáticamente con cada partida registrada.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;" id="kpi-cards">
+    <div class="card" style="text-align:center;" id="kc-wr">
+      <div style="font-size:11px;color:var(--muted);">Win Rate</div>
+      <div style="font-size:24px;font-weight:600;color:var(--text);margin:4px 0;" id="kv-wr">—</div>
+      <div style="font-size:10px;color:var(--muted);">últimas partidas</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:11px;color:var(--muted);">CS/min avg</div>
+      <div style="font-size:24px;font-weight:600;" id="kv-cs">—</div>
+      <div style="font-size:10px;color:var(--muted);">target: 5.5+</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:11px;color:var(--muted);">Deaths avg</div>
+      <div style="font-size:24px;font-weight:600;" id="kv-deaths">—</div>
+      <div style="font-size:10px;color:var(--muted);">target: 5 o menos</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:11px;color:var(--muted);">DQS avg</div>
+      <div style="font-size:24px;font-weight:600;" id="kv-dqs">—</div>
+      <div style="font-size:10px;color:var(--muted);">target: 65%+</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px;">
+    <div class="card" style="text-align:center;">
+      <div style="font-size:11px;color:var(--muted);">Kill Part. avg</div>
+      <div style="font-size:20px;font-weight:600;" id="kv-kp">—</div>
+      <div style="font-size:10px;color:var(--muted);">target: 50%+</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:11px;color:var(--muted);">Vis. Score/m</div>
+      <div style="font-size:20px;font-weight:600;" id="kv-vision">—</div>
+      <div style="font-size:10px;color:var(--muted);">target: 0.8+</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:11px;color:var(--muted);">Partidas</div>
+      <div style="font-size:20px;font-weight:600;color:var(--text);" id="kv-total">0</div>
+      <div style="font-size:10px;color:var(--muted);">registradas</div>
+    </div>
+  </div>
+
+  <!-- KPI BARS -->
+  <h3>Progreso vs targets Oro-Platino</h3>
+  <div style="margin-bottom:24px;" id="kpi-bars">
+    <div style="margin-bottom:10px;" id="bar-cs">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+        <span style="color:var(--text);font-weight:500;">CS/min</span>
+        <span style="color:var(--muted);"><span id="bar-cs-val">0</span> / 5.5</span>
+      </div>
+      <div style="height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;">
+        <div id="bar-cs-fill" style="height:100%;width:0%;border-radius:3px;transition:width 0.5s,background 0.3s;background:var(--red);"></div>
+      </div>
+    </div>
+    <div style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+        <span style="color:var(--text);font-weight:500;">Deaths (/game)</span>
+        <span style="color:var(--muted);"><span id="bar-deaths-val">0</span> / 5.0</span>
+      </div>
+      <div style="height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;">
+        <div id="bar-deaths-fill" style="height:100%;width:0%;border-radius:3px;transition:width 0.5s,background 0.3s;background:var(--red);"></div>
+      </div>
+    </div>
+    <div style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+        <span style="color:var(--text);font-weight:500;">Kill Participation</span>
+        <span style="color:var(--muted);"><span id="bar-kp-val">0</span>% / 50%</span>
+      </div>
+      <div style="height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;">
+        <div id="bar-kp-fill" style="height:100%;width:0%;border-radius:3px;transition:width 0.5s,background 0.3s;background:var(--red);"></div>
+      </div>
+    </div>
+    <div style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+        <span style="color:var(--text);font-weight:500;">Vision Score/min</span>
+        <span style="color:var(--muted);"><span id="bar-vis-val">0</span> / 0.8</span>
+      </div>
+      <div style="height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;">
+        <div id="bar-vis-fill" style="height:100%;width:0%;border-radius:3px;transition:width 0.5s,background 0.3s;background:var(--red);"></div>
+      </div>
+    </div>
+    <div style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+        <span style="color:var(--text);font-weight:500;">Decision Quality</span>
+        <span style="color:var(--muted);"><span id="bar-dqs-val">0</span>% / 65%</span>
+      </div>
+      <div style="height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;">
+        <div id="bar-dqs-fill" style="height:100%;width:0%;border-radius:3px;transition:width 0.5s,background 0.3s;background:var(--red);"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME HISTORY -->
+  <h3>Historial de partidas</h3>
+  <div id="game-history" style="margin-bottom:20px;">
+    <div class="card" style="text-align:center;color:var(--muted);font-size:13px;">Sin partidas registradas. Juega una partida y regístrala arriba.</div>
+  </div>
+
+  <div style="display:flex;gap:8px;">
+    <button onclick="exportData()" style="flex:1;padding:8px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--text);font-family:Figtree,sans-serif;font-size:12px;cursor:pointer;">Exportar datos (JSON)</button>
+    <button onclick="if(confirm('¿Borrar TODOS los datos? Esto no se puede deshacer.')) { localStorage.removeItem('lol_kpi_games'); refreshDashboard(); }" style="flex:1;padding:8px;border-radius:7px;border:1px solid rgba(245,90,90,0.3);background:transparent;color:var(--red);font-family:Figtree,sans-serif;font-size:12px;cursor:pointer;">Borrar todo</button>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="goTo(13)">← Anterior</button>
+    <button class="nav-btn" onclick="goTo(0)" style="color:var(--accent);border-color:rgba(200,245,90,0.3);">↩ Volver al inicio</button>
+  </div>
+</div>
+
+</main>
+
+<script>
+// Navigation state
+let cur = 0;
+const total = 15;
+
+function goTo(n) {
+  document.getElementById('p'+cur).classList.remove('active');
+  document.getElementById('cb-'+cur).classList.remove('active');
+  cur = n;
+  document.getElementById('p'+cur).classList.add('active');
+  document.getElementById('cb-'+cur).classList.add('active');
+  document.getElementById('prog-text').textContent = (cur+1)+'/'+total;
+  document.getElementById('prog-fill').style.width = ((cur+1)/total*100)+'%';
+  window.scrollTo(0,0);
+  setTimeout(function(){ if(typeof injectIcons==='function') injectIcons(); }, 100);
+}
+
+// Champ panel switcher (pool page)
+function swChamp(c) {
+  document.querySelectorAll('.champ-tab').forEach((t,i) => {
+    t.classList.toggle('active', ['sylas','viego','diana'][i] === c);
+  });
+  ['cp-sylas','cp-viego','cp-diana'].forEach(id => {
+    document.getElementById(id).classList.toggle('active', id === 'cp-'+c);
+  });
+  setTimeout(injectIcons, 50);
+}
+
+// Gank evaluator switcher
+function swGank(c) {
+  const idx = ['sylas','viego','diana'].indexOf(c);
+  document.querySelectorAll('#p12 .champ-tab').forEach((t,i) => t.classList.toggle('active', i === idx));
+  ['gp-sylas','gp-viego','gp-diana'].forEach((id,i) => {
+    document.getElementById(id).style.display = i === idx ? '' : 'none';
+  });
+}
+
+// Composition panel switcher
+function swComp(c) {
+  const idx = ['sylas','viego','diana'].indexOf(c);
+  document.querySelectorAll('#comp-tabs .champ-tab').forEach((t,i) => t.classList.toggle('active', i === idx));
+  ['comp-sylas','comp-viego','comp-diana'].forEach((id,i) => {
+    document.getElementById(id).classList.toggle('active', i === idx);
+  });
+  setTimeout(injectIcons, 50);
+}
+
+// Gank factor toggle: null → yes → no → null
+const gankState = {};
+
+function tg(el, prefix, factor) {
+  const key = prefix+'_'+factor;
+  const dot = el.querySelector('.gf-dot');
+  const cur = gankState[key] || null;
+  const next = cur === null ? 'yes' : cur === 'yes' ? 'no' : null;
+  gankState[key] = next;
+  el.classList.remove('yes','no');
+  dot.classList.remove('yes','no');
+  if (next) { el.classList.add(next); dot.classList.add(next); }
+  updateGankVerdict(prefix);
+}
+
+function updateGankVerdict(prefix) {
+  const factors = ['g','a','n','k'];
+  const vals = factors.map(f => gankState[prefix+'_'+f] || null);
+  const filled = vals.filter(v => v).length;
+  const yes = vals.filter(v => v === 'yes').length;
+  const verd = document.getElementById('verd-'+prefix);
+  verd.className = 'verdict';
+
+  if (filled < 4) {
+    verd.classList.add('v-wait');
+    verd.textContent = filled+'/4 evaluados — click = verde, doble click = rojo, triple = reset.';
+    return;
+  }
+
+  // Diana special: without R2 (factor A = no) pre-6
+  if (prefix === 'dg' && gankState['dg_a'] === 'no') {
+    verd.classList.add('v-stop');
+    verd.textContent = 'Pre-6 → NO gankees. Haz full clear hacia nivel 6. Diana sin R2 es muy difícil de cerrar.';
+    return;
+  }
+
+  if (yes >= 4) {
+    verd.classList.add('v-go');
+    verd.textContent = '4/4 verde — Kill altamente probable. Ejecútalo sin dudar. No hay razón para no entrar.';
+  } else if (yes === 3) {
+    verd.classList.add('v-go');
+    verd.textContent = '3/4 verde — Flash forzado + presión + crash de ola. Vale la pena. Entra.';
+  } else if (yes === 2) {
+    verd.classList.add('v-maybe');
+    verd.textContent = '2/4 verde — Riesgo alto. Solo si el factor que falla es compensable con el CC de tu laner.';
+  } else {
+    verd.classList.add('v-stop');
+    verd.textContent = 'Menos de 2/4 verde — NO gankees. Farmea, busca otra línea o prepara countergank.';
+  }
+}
+
+// Loading checklist
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  const all = document.querySelectorAll('#loading-checklist .check-item');
+  const done = document.querySelectorAll('#loading-checklist .check-item.checked');
+  if (done.length === all.length) {
+    document.getElementById('loading-complete').style.display = 'block';
+  } else {
+    document.getElementById('loading-complete').style.display = 'none';
+  }
+}
+
+// ===================== ICON AUTO-INJECTION =====================
+const DDR = 'https://ddragon.leagueoflegends.com/cdn';
+let ddrVer = '14.24.1';
+
+const champMap = {
+  'Dr. Mundo':'DrMundo','Jarvan IV':'JarvanIV','Nunu y Willump':'Nunu','Nunu':'Nunu',
+  'Wukong':'MonkeyKing',"Kha'Zix":'Khazix',"Bel'Veth":'Belveth','Xin Zhao':'XinZhao',
+  'Aurelion Sol':'AurelionSol','LeBlanc':'Leblanc','Master Yi':'MasterYi',
+  "Rek'Sai":'RekSai','Tahm Kench':'TahmKench','Lee Sin':'LeeSin',
+  "Cho'Gath":'Chogath','Miss Fortune':'MissFortune','Maestro Yi':'MasterYi'
+};
+
+function champKey(name) {
+  if (!name) return null;
+  const n = name.trim();
+  if (champMap[n]) return champMap[n];
+  const clean = n.replace(/['\s]/g,'');
+  return clean.charAt(0).toUpperCase() + clean.slice(1);
+}
+
+function iconUrl(name) {
+  const key = champKey(name);
+  if (!key || key.length < 2) return null;
+  return DDR + '/' + ddrVer + '/img/champion/' + key + '.png';
+}
+
+const spellMap = {
+  sylas: {P:'Sylas_Passive',Q:'SylasQ',W:'SylasW',E:'SylasE',R:'SylasR'},
+  viego: {P:'ViegoPassive',Q:'ViegoQ',W:'ViegoW',E:'ViegoE',R:'ViegoR'},
+  diana: {P:'Diana_Passive',Q:'DianaQ',W:'DianaOrbs',E:'DianaTeleport',R:'DianaR'}
+};
+
+function spellUrl(champ, key) {
+  const c = champ.toLowerCase();
+  const m = spellMap[c];
+  if (!m) return null;
+  const spell = m[key.toUpperCase()];
+  if (!spell) return null;
+  const folder = key.toUpperCase() === 'P' ? 'passive' : 'spell';
+  const url = DDR + '/' + ddrVer + '/img/' + folder + '/' + spell + '.png';
+  return url;
+}
+
+function cdragonSpellUrl(champ, key) {
+  const names = {
+    sylas: {P:'sylas/sylas_passive',Q:'sylas/sylasq',W:'sylas/sylasw',E:'sylas/sylase',R:'sylas/sylasr'},
+    viego: {P:'viego/viegopassive',Q:'viego/viegoq',W:'viego/viegow',E:'viego/viegoe',R:'viego/viegor'},
+    diana: {P:'diana/diana_passive',Q:'diana/dianaq',W:'diana/dianaorbs',E:'diana/dianateleport',R:'diana/dianar'}
+  };
+  const c = champ.toLowerCase();
+  if (!names[c]) return null;
+  const spellName = names[c][key.toUpperCase()];
+  if (!spellName) return null;
+  return 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/' + spellName.split('/')[0] + '.png';
+}
+
+function injectIcons() {
+  // 1. Matchup items - add champion icon before name
+  document.querySelectorAll('.mi-name-bad, .mi-name-good').forEach(el => {
+    const name = el.childNodes[0]?.textContent?.trim();
+    if (!name || el.querySelector('img')) return;
+    const url = iconUrl(name);
+    if (!url) return;
+    const img = document.createElement('img');
+    img.src = url;
+    img.className = 'ci ci-sm';
+    img.alt = name;
+    img.loading = 'lazy';
+    img.onerror = function() { this.style.display = 'none'; };
+    el.prepend(img);
+  });
+
+  // 2. Composition cards - add champion icon
+  document.querySelectorAll('.card strong, .card-accent strong, .card-gold strong').forEach(el => {
+    const parent = el.closest('.card');
+    if (!parent || parent.querySelector('img.ci')) return;
+    const name = el.textContent.trim();
+    if (name.length > 20 || name.includes(' — ') || name.includes(':') || name.includes('.')) return;
+    const knownChamps = ['Leona','Nautilus','Thresh','Rell','Alistar','Amumu','Malphite','Ornn','Kennen','Sion','Orianna','Yasuo','Viktor','Brand','Jarvan IV','Sejuani','Shyvana','Hecarim'];
+    if (!knownChamps.includes(name)) return;
+    const url = iconUrl(name);
+    if (!url) return;
+    const img = document.createElement('img');
+    img.src = url;
+    img.className = 'ci ci-sm';
+    img.alt = name;
+    img.loading = 'lazy';
+    img.onerror = function() { this.style.display = 'none'; };
+    img.style.verticalAlign = 'middle';
+    img.style.marginRight = '6px';
+    el.prepend(img);
+  });
+
+  // 3. Ability rows - replace letter badges with actual icons
+  document.querySelectorAll('.ability-row').forEach(row => {
+    const keyEl = row.querySelector('.ability-key');
+    if (!keyEl || keyEl.querySelector('img')) return;
+    const letter = keyEl.textContent.trim();
+    const panel = row.closest('.champ-panel');
+    if (!panel) return;
+    const panelId = panel.id;
+    let champ = null;
+    if (panelId.includes('sylas')) champ = 'sylas';
+    else if (panelId.includes('viego')) champ = 'viego';
+    else if (panelId.includes('diana')) champ = 'diana';
+    if (!champ) return;
+    const url = spellUrl(champ, letter);
+    if (!url) return;
+    const origText = letter;
+    const img = document.createElement('img');
+    img.src = url;
+    img.className = 'ability-icon';
+    img.alt = letter;
+    img.loading = 'lazy';
+    img.onerror = function() {
+      this.style.display = 'none';
+      if(!keyEl.querySelector('span')) {
+        const sp = document.createElement('span');
+        sp.textContent = origText;
+        sp.style.cssText = 'font-family:DM Mono,monospace;font-size:13px;font-weight:500;';
+        keyEl.appendChild(sp);
+      }
+    };
+    keyEl.style.overflow = 'hidden';
+    keyEl.style.padding = '0';
+    keyEl.textContent = '';
+    keyEl.appendChild(img);
+  });
+
+  // 4. Champion tabs - add small icons
+  document.querySelectorAll('.champ-tab').forEach(tab => {
+    if (tab.querySelector('img')) return;
+    const text = tab.textContent.trim();
+    let champ = null;
+    if (text.startsWith('Sylas')) champ = 'Sylas';
+    else if (text.startsWith('Viego')) champ = 'Viego';
+    else if (text.startsWith('Diana')) champ = 'Diana';
+    if (!champ) return;
+    const url = iconUrl(champ);
+    if (!url) return;
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = champ;
+    img.loading = 'lazy';
+    img.onerror = function() { this.style.display = 'none'; };
+    tab.prepend(img);
+  });
+
+  // 5. Ult tier table - add icons to pill elements
+  document.querySelectorAll('.data-table .pill-accent').forEach(pill => {
+    const name = pill.textContent.trim();
+    if (pill.querySelector('img') || !name || name.length > 20) return;
+    const knownUlts = ['Amumu','Malphite','Jarvan IV','Sejuani','Hecarim','Shyvana','Orianna','Karthus'];
+    if (!knownUlts.includes(name)) return;
+    const url = iconUrl(name);
+    if (!url) return;
+    const img = document.createElement('img');
+    img.src = url;
+    img.className = 'ci ci-sm';
+    img.alt = name;
+    img.loading = 'lazy';
+    img.onerror = function() { this.style.display = 'none'; };
+    img.style.marginRight = '4px';
+    pill.prepend(img);
+    pill.style.display = 'inline-flex';
+    pill.style.alignItems = 'center';
+    pill.style.padding = '2px 8px 2px 3px';
+  });
+
+  // 6. Pick table - add icons to pills in the table
+  document.querySelectorAll('#p13 .data-table .pill-accent, #p13 .data-table .pill-gold, #p13 .data-table .pill-green').forEach(pill => {
+    const name = pill.textContent.trim();
+    if (pill.querySelector('img') || !['Sylas','Viego','Diana'].includes(name)) return;
+    const url = iconUrl(name);
+    if (!url) return;
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = name;
+    img.loading = 'lazy';
+    img.style.width = '16px';
+    img.style.height = '16px';
+    img.style.borderRadius = '3px';
+    img.style.marginRight = '4px';
+    img.style.verticalAlign = 'middle';
+    img.onerror = function() { this.style.display = 'none'; };
+    pill.prepend(img);
+    pill.style.display = 'inline-flex';
+    pill.style.alignItems = 'center';
+    pill.style.padding = '2px 8px 2px 3px';
+  });
+
+  // 7. Sidebar champion portraits
+  const header = document.querySelector('.sidebar-header');
+  if (header && !header.querySelector('.sidebar-champs')) {
+    const strip = document.createElement('div');
+    strip.className = 'sidebar-champs';
+    strip.style.cssText = 'display:flex;gap:6px;margin-top:10px;';
+    ['Sylas','Viego','Diana'].forEach(c => {
+      const img = document.createElement('img');
+      img.src = iconUrl(c);
+      img.alt = c;
+      img.loading = 'lazy';
+      img.style.cssText = 'width:32px;height:32px;border-radius:6px;border:1.5px solid rgba(255,255,255,0.1);cursor:pointer;transition:all 0.2s;';
+      img.title = c;
+      img.onmouseenter = function() { this.style.borderColor = '#c8f55a'; this.style.transform = 'scale(1.1)'; };
+      img.onmouseleave = function() { this.style.borderColor = 'rgba(255,255,255,0.1)'; this.style.transform = 'scale(1)'; };
+      img.onerror = function() { this.style.display = 'none'; };
+      strip.appendChild(img);
+    });
+    header.appendChild(strip);
+  }
+}
+
+// Fetch latest ddragon version, then inject icons
+fetch('https://ddragon.leagueoflegends.com/api/versions.json')
+  .then(r => r.json())
+  .then(versions => {
+    if (versions && versions[0]) ddrVer = versions[0];
+    injectIcons();
+  })
+  .catch(() => {
+    injectIcons();
+  });
+
+// ===================== KPI TRACKER =====================
+const STORAGE_KEY = 'lol_kpi_games';
+
+function getGames() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch(e) { return []; }
+}
+
+function toggleDqs(el) {
+  const cur = el.getAttribute('data-val');
+  if (cur === '0') {
+    el.setAttribute('data-val', '1');
+    el.style.background = 'rgba(90,245,192,0.15)';
+    el.style.borderColor = 'rgba(90,245,192,0.4)';
+    el.style.color = '#5af5c0';
+  } else {
+    el.setAttribute('data-val', '0');
+    el.style.background = 'var(--surface2)';
+    el.style.borderColor = 'var(--border2)';
+    el.style.color = 'var(--muted)';
+  }
+}
+
+function saveGame() {
+  const champ = document.getElementById('kpi-champ').value;
+  const result = document.getElementById('kpi-result').value;
+  const enemy = document.getElementById('kpi-enemy').value.trim() || '—';
+  const cs = parseFloat(document.getElementById('kpi-cs').value);
+  const deaths = parseInt(document.getElementById('kpi-deaths').value);
+  const kp = parseInt(document.getElementById('kpi-kp').value);
+  const vision = parseFloat(document.getElementById('kpi-vision').value);
+  const duration = parseInt(document.getElementById('kpi-duration').value) || 0;
+  const notes = document.getElementById('kpi-notes').value.trim();
+
+  if (isNaN(cs) || isNaN(deaths) || isNaN(kp) || isNaN(vision)) {
+    const fb = document.getElementById('save-feedback');
+    fb.style.display = 'block';
+    fb.style.background = 'rgba(245,90,90,0.1)';
+    fb.style.borderColor = 'rgba(245,90,90,0.25)';
+    fb.style.color = '#f55a5a';
+    fb.textContent = 'Llena CS/min, Muertes, Kill Part. y Vision Score antes de guardar.';
+    setTimeout(function(){ fb.style.display = 'none'; }, 3000);
+    return;
+  }
+
+  const dqsBtns = document.querySelectorAll('#dqs-grid .dqs-btn');
+  let dqsYes = 0;
+  dqsBtns.forEach(function(b) { if (b.getAttribute('data-val') === '1') dqsYes++; });
+  const dqs = Math.round((dqsYes / 5) * 100);
+
+  const game = {
+    id: Date.now(),
+    date: new Date().toLocaleDateString('es-CO', {day:'2-digit',month:'short',year:'2-digit'}),
+    champ: champ,
+    result: result,
+    enemy: enemy,
+    cs: cs,
+    deaths: deaths,
+    kp: kp,
+    vision: vision,
+    duration: duration,
+    dqs: dqs,
+    notes: notes
+  };
+
+  const games = getGames();
+  games.unshift(game);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(games));
+
+  // Reset form
+  document.getElementById('kpi-cs').value = '';
+  document.getElementById('kpi-deaths').value = '';
+  document.getElementById('kpi-kp').value = '';
+  document.getElementById('kpi-vision').value = '';
+  document.getElementById('kpi-duration').value = '';
+  document.getElementById('kpi-enemy').value = '';
+  document.getElementById('kpi-notes').value = '';
+  dqsBtns.forEach(function(b) {
+    b.setAttribute('data-val', '0');
+    b.style.background = 'var(--surface2)';
+    b.style.borderColor = 'var(--border2)';
+    b.style.color = 'var(--muted)';
+  });
+
+  const fb = document.getElementById('save-feedback');
+  fb.style.display = 'block';
+  fb.style.background = 'rgba(90,245,192,0.1)';
+  fb.style.borderColor = 'rgba(90,245,192,0.25)';
+  fb.style.color = '#5af5c0';
+  fb.textContent = 'Partida guardada — ' + champ + ' ' + result + ' vs ' + enemy;
+  setTimeout(function(){ fb.style.display = 'none'; }, 3000);
+
+  refreshDashboard();
+}
+
+function kpiColor(val, target, inverse) {
+  if (inverse) {
+    return val <= target ? '#5af5c0' : val <= target * 1.4 ? '#f5d05a' : '#f55a5a';
+  }
+  return val >= target ? '#5af5c0' : val >= target * 0.7 ? '#f5d05a' : '#f55a5a';
+}
+
+function refreshDashboard() {
+  const games = getGames();
+  const n = games.length;
+
+  document.getElementById('kv-total').textContent = n;
+
+  if (n === 0) {
+    ['kv-wr','kv-cs','kv-deaths','kv-dqs','kv-kp','kv-vision'].forEach(function(id) {
+      document.getElementById(id).textContent = '—';
+      document.getElementById(id).style.color = 'var(--text)';
+    });
+    ['bar-cs-fill','bar-deaths-fill','bar-kp-fill','bar-vis-fill','bar-dqs-fill'].forEach(function(id) {
+      document.getElementById(id).style.width = '0%';
+    });
+    document.getElementById('game-history').innerHTML = '<div class="card" style="text-align:center;color:var(--muted);font-size:13px;">Sin partidas registradas.</div>';
+    return;
+  }
+
+  const wins = games.filter(function(g) { return g.result === 'W'; }).length;
+  const wr = Math.round((wins / n) * 100);
+  const avgCs = (games.reduce(function(s,g) { return s + g.cs; }, 0) / n).toFixed(1);
+  const avgDeaths = (games.reduce(function(s,g) { return s + g.deaths; }, 0) / n).toFixed(1);
+  const avgKp = Math.round(games.reduce(function(s,g) { return s + g.kp; }, 0) / n);
+  const avgVision = (games.reduce(function(s,g) { return s + g.vision; }, 0) / n).toFixed(1);
+  const avgDqs = Math.round(games.reduce(function(s,g) { return s + g.dqs; }, 0) / n);
+
+  const wrEl = document.getElementById('kv-wr');
+  wrEl.textContent = wr + '%';
+  wrEl.style.color = wr >= 52 ? '#5af5c0' : wr >= 48 ? '#f5d05a' : '#f55a5a';
+
+  const csEl = document.getElementById('kv-cs');
+  csEl.textContent = avgCs;
+  csEl.style.color = kpiColor(parseFloat(avgCs), 5.5);
+
+  const deathsEl = document.getElementById('kv-deaths');
+  deathsEl.textContent = avgDeaths;
+  deathsEl.style.color = kpiColor(parseFloat(avgDeaths), 5, true);
+
+  const dqsEl = document.getElementById('kv-dqs');
+  dqsEl.textContent = avgDqs + '%';
+  dqsEl.style.color = kpiColor(avgDqs, 65);
+
+  const kpEl = document.getElementById('kv-kp');
+  kpEl.textContent = avgKp + '%';
+  kpEl.style.color = kpiColor(avgKp, 50);
+
+  const visEl = document.getElementById('kv-vision');
+  visEl.textContent = avgVision;
+  visEl.style.color = kpiColor(parseFloat(avgVision), 0.8);
+
+  // Bars
+  function setBar(fillId, valId, val, target, inverse) {
+    var pct = inverse ? Math.max(0, Math.min(100, (1 - (val - target) / target) * 100)) : Math.min(100, (val / target) * 100);
+    if (inverse) pct = val <= target ? 100 : Math.max(0, 100 - ((val - target) / target) * 100);
+    document.getElementById(fillId).style.width = Math.min(100, pct) + '%';
+    document.getElementById(fillId).style.background = inverse ? kpiColor(val, target, true) : kpiColor(val, target);
+    document.getElementById(valId).textContent = inverse ? val : val;
+  }
+
+  setBar('bar-cs-fill', 'bar-cs-val', parseFloat(avgCs), 5.5, false);
+  setBar('bar-deaths-fill', 'bar-deaths-val', parseFloat(avgDeaths), 5, true);
+  setBar('bar-kp-fill', 'bar-kp-val', avgKp, 50, false);
+  setBar('bar-vis-fill', 'bar-vis-val', parseFloat(avgVision), 0.8, false);
+  setBar('bar-dqs-fill', 'bar-dqs-val', avgDqs, 65, false);
+
+  // History
+  var html = '<div style="display:flex;flex-direction:column;gap:6px;">';
+  var show = games.slice(0, 20);
+  show.forEach(function(g) {
+    var isW = g.result === 'W';
+    var borderColor = isW ? 'rgba(90,245,192,0.25)' : 'rgba(245,90,90,0.2)';
+    var bg = isW ? 'rgba(90,245,192,0.04)' : 'rgba(245,90,90,0.04)';
+    var resultColor = isW ? '#5af5c0' : '#f55a5a';
+    var resultText = isW ? 'W' : 'L';
+
+    html += '<div style="display:grid;grid-template-columns:28px 70px 1fr 50px 50px 50px 50px 50px;gap:8px;align-items:center;padding:8px 12px;border-radius:8px;border:1px solid ' + borderColor + ';background:' + bg + ';font-size:12px;">';
+    html += '<span style="font-weight:600;color:' + resultColor + ';font-size:14px;text-align:center;">' + resultText + '</span>';
+    html += '<span style="color:var(--text);font-weight:500;">' + g.champ + '</span>';
+    html += '<span style="color:var(--muted);">vs ' + g.enemy + '</span>';
+    html += '<span style="color:' + kpiColor(g.cs, 5.5) + ';text-align:center;" title="CS/min">' + g.cs + '</span>';
+    html += '<span style="color:' + kpiColor(g.deaths, 5, true) + ';text-align:center;" title="Deaths">' + g.deaths + 'd</span>';
+    html += '<span style="color:' + kpiColor(g.kp, 50) + ';text-align:center;" title="KP%">' + g.kp + '%</span>';
+    html += '<span style="color:' + kpiColor(g.vision, 0.8) + ';text-align:center;" title="Vision">' + g.vision + '</span>';
+    html += '<span style="color:' + kpiColor(g.dqs, 65) + ';text-align:center;" title="DQS">' + g.dqs + '%</span>';
+    html += '</div>';
+  });
+  if (games.length > 20) {
+    html += '<div style="text-align:center;color:var(--muted);font-size:12px;padding:8px;">... y ' + (games.length - 20) + ' partidas más</div>';
+  }
+  html += '</div>';
+  document.getElementById('game-history').innerHTML = html;
+}
+
+function exportData() {
+  var games = getGames();
+  var blob = new Blob([JSON.stringify(games, null, 2)], {type: 'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'lol_kpi_data_' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Load dashboard on page load
+refreshDashboard();
+</script>
+</body>
+</html>
